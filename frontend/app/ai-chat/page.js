@@ -4,323 +4,305 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Send, Bot, User, Clock, Trash2, Copy, ThumbsUp, ThumbsDown, AlertCircle } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { api, getErrorMessage } from "@/lib/api"
-import ReactMarkdown from 'react-markdown'
-import useDocumentStore from "@/src/store/documentStore"
-import Link from 'next/link'
+import { Send, Bot, User, Clock, FileText, Lightbulb, Trash2, Copy, ThumbsUp, ThumbsDown } from "lucide-react"
+
+// Mock chat history
+const initialMessages = [
+  {
+    id: 1,
+    role: "assistant",
+    content: "Hello! I'm your InterviewBuddy AI assistant. How can I help with your interview preparation today?",
+    timestamp: "10:30 AM",
+  },
+  {
+    id: 2,
+    role: "user",
+    content: "Can you explain time complexity in Big O notation?",
+    timestamp: "10:31 AM",
+  },
+  {
+    id: 3,
+    role: "assistant",
+    content:
+      "Big O notation is used to describe the performance or complexity of an algorithm. It specifically describes the worst-case scenario and can be used to describe the execution time required or the space used by an algorithm.\n\nHere are the common Big O notations:\n\n- O(1): Constant time complexity. The algorithm takes the same amount of time regardless of input size.\n- O(log n): Logarithmic time complexity. The algorithm's time increases logarithmically as input size grows.\n- O(n): Linear time complexity. The algorithm's time increases linearly with input size.\n- O(n log n): Linearithmic time complexity. Common in efficient sorting algorithms like merge sort.\n- O(n²): Quadratic time complexity. Often seen in algorithms with nested loops.\n- O(2^n): Exponential time complexity. The algorithm's time doubles with each addition to the input.\n\nWould you like me to provide examples of algorithms for each of these time complexities?",
+    timestamp: "10:32 AM",
+    sources: ["Data Structures Notes.pdf", "Algorithm Cheat Sheet.docx"],
+  },
+]
 
 export default function AIChat() {
-  const { selectedDocument } = useDocumentStore()
-
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState(initialMessages)
   const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [isTyping, setIsTyping] = useState(false)
   const messagesEndRef = useRef(null)
-  const { toast } = useToast()
 
-  useEffect(() => {
-    const fetchChatHistory = async (document) => {
-      if (!document || !document.filename) {
-        setMessages([{
-          role: "assistant",
-          content: "Please select a document from the 'Document Upload' page to start chatting.",
-          timestamp: new Date().toISOString()
-        }])
-        return
-      }
-
-      try {
-        setIsLoading(true)
-        setError(null)
-        const response = await api.chat.getHistory(document.filename)
-
-        if (response.data && Array.isArray(response.data) && response.data.length > 0) {
-          setMessages(response.data.map(msg => ({
-            ...msg,
-            timestamp: formatTimestamp(msg.timestamp)
-          })))
-        } else {
-          setMessages([{
-            role: "assistant",
-            content: `Hello! I'm ready to chat about "${document.filename}". What would you like to know?`,
-            timestamp: formatTimestamp(new Date().toISOString())
-          }])
-        }
-      } catch (error) {
-        console.error('Failed to fetch chat history:', error)
-        setError("Failed to load chat history: " + getErrorMessage(error))
-        toast({
-          title: "Error",
-          description: "Failed to load chat history",
-          variant: "destructive"
-        })
-        setMessages([{
-          role: "assistant",
-          content: "Sorry, I couldn't load the chat history for this document.",
-          timestamp: formatTimestamp(new Date().toISOString())
-        }])
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchChatHistory(selectedDocument)
-  }, [selectedDocument, toast])
-
-  useEffect(() => {
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }
+
+  useEffect(() => {
+    scrollToBottom()
   }, [messages])
 
-  const handleSendMessage = async (e) => {
+  const handleSendMessage = (e) => {
     e.preventDefault()
-    if (!input.trim() || !selectedDocument || !selectedDocument.filename) {
-      toast({
-        title: "Cannot send message",
-        description: "Please select a document first.",
-        variant: "warning"
-      })
-      return
-    }
+    if (!input.trim()) return
 
-    const timestamp = formatTimestamp(new Date().toISOString())
-
+    // Add user message
     const userMessage = {
+      id: messages.length + 1,
       role: "user",
       content: input,
-      timestamp: timestamp,
+      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     }
 
-    setMessages(prev => [...prev, userMessage])
-    setIsLoading(true)
-    setError(null)
+    setMessages([...messages, userMessage])
     setInput("")
+    setIsTyping(true)
 
-    try {
-      const response = await api.chat.askQuestion(selectedDocument.filename, userMessage.content)
-
-      if (response.data && response.data.history && Array.isArray(response.data.history)) {
-        setMessages(response.data.history.map(msg => ({
-          ...msg,
-          timestamp: formatTimestamp(msg.timestamp)
-        })))
-      } else if (response.data && response.data.answer) {
-        const assistantMessage = {
-          role: "assistant",
-          content: response.data.answer,
-          timestamp: formatTimestamp(new Date().toISOString()),
-          sources: response.data.sources || []
-        }
-        setMessages(prev => [...prev, assistantMessage])
-      } else {
-        throw new Error("Invalid response format from chat API")
-      }
-    } catch (error) {
-      console.error('Failed to send message:', error)
-      const errorMsg = "Failed to get response: " + getErrorMessage(error)
-      setError(errorMsg)
-
-      setMessages(prev => [...prev, {
+    // Simulate AI response after a delay
+    setTimeout(() => {
+      const aiMessage = {
+        id: messages.length + 2,
         role: "assistant",
-        content: "Sorry, I encountered an error. Please try again.",
-        timestamp: formatTimestamp(new Date().toISOString())
-      }])
+        content:
+          "I'm simulating an AI response to your question about: " +
+          input +
+          "\n\nThis is where the actual AI-generated content would appear based on your uploaded documents and the context of your conversation.",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        sources: ["Data Structures Notes.pdf"],
+      }
 
-      toast({
-        title: "Error",
-        description: errorMsg,
-        variant: "destructive"
-      })
-    } finally {
-      setIsLoading(false)
-    }
+      setMessages((prev) => [...prev, aiMessage])
+      setIsTyping(false)
+    }, 1500)
   }
 
   const clearChat = () => {
-    if (selectedDocument && selectedDocument.filename) {
-      setMessages([{
+    setMessages([
+      {
+        id: 1,
         role: "assistant",
-        content: `Chat history cleared. Ask me anything about "${selectedDocument.filename}".`,
-        timestamp: formatTimestamp(new Date().toISOString())
-      }])
-    } else {
-      setMessages([{
-        role: "assistant",
-        content: "Please select a document from the 'Document Upload' page to start chatting.",
-        timestamp: formatTimestamp(new Date().toISOString())
-      }])
-    }
-    setError(null)
+        content: "Hello! I'm your InterviewBuddy AI assistant. How can I help with your interview preparation today?",
+        timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      },
+    ])
   }
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
-    toast({
-      description: "Copied to clipboard",
-    })
-  }
-
-  const formatTimestamp = (timestamp) => {
-    if (!timestamp) return ""
-    try {
-      if (typeof timestamp === 'string' && /^\d{1,2}:\d{2}(:\d{2})?(\s(AM|PM))?$/i.test(timestamp)) {
-        return timestamp
-      }
-      const date = new Date(timestamp)
-      if (isNaN(date.getTime())) {
-        return "Invalid Date"
-      }
-      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    } catch (e) {
-      console.error("Error formatting timestamp:", timestamp, e)
-      return typeof timestamp === 'string' ? timestamp : "Error"
-    }
+    // You could add a toast notification here
   }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold mb-6">AI Chat Assistant</h1>
 
-      <Card className="lg:col-span-4 h-[calc(100vh-12rem)] flex flex-col">
-        <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
-          <div className="p-4 border-b flex justify-between items-center">
-            <div className="flex items-center">
-              <Avatar className="h-8 w-8 mr-2">
-                <AvatarFallback>
-                  <Bot className="h-4 w-4" />
-                </AvatarFallback>
-              </Avatar>
-              <div>
-                <h3 className="font-medium">InterviewBuddy AI</h3>
-                <p className="text-xs text-muted-foreground">
-                  {selectedDocument 
-                    ? `Chatting with: ${selectedDocument.filename}` 
-                    : "Please select a document to start chatting"}
-                </p>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Document Context Sidebar */}
+        <Card className="lg:col-span-1 h-[calc(100vh-12rem)] flex flex-col">
+          <Tabs defaultValue="documents">
+            <TabsList className="w-full">
+              <TabsTrigger value="documents" className="flex-1">
+                Documents
+              </TabsTrigger>
+              <TabsTrigger value="history" className="flex-1">
+                History
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="documents" className="flex-1 overflow-auto p-4">
+              <h3 className="font-medium mb-3">Available Documents</h3>
+              <div className="space-y-2">
+                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                  <FileText className="h-4 w-4 mr-2 text-blue-500" />
+                  <span className="text-sm">Data Structures Notes.pdf</span>
+                </div>
+                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                  <FileText className="h-4 w-4 mr-2 text-blue-500" />
+                  <span className="text-sm">Algorithm Cheat Sheet.docx</span>
+                </div>
+                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                  <FileText className="h-4 w-4 mr-2 text-gray-500" />
+                  <span className="text-sm">System Design Interview.txt</span>
+                </div>
               </div>
+
+              <h3 className="font-medium mt-6 mb-3">Suggested Questions</h3>
+              <div className="space-y-2">
+                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                  <Lightbulb className="h-4 w-4 mr-2 text-yellow-500" />
+                  <span className="text-sm">Explain merge sort vs quick sort</span>
+                </div>
+                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                  <Lightbulb className="h-4 w-4 mr-2 text-yellow-500" />
+                  <span className="text-sm">What is dynamic programming?</span>
+                </div>
+                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                  <Lightbulb className="h-4 w-4 mr-2 text-yellow-500" />
+                  <span className="text-sm">Explain hash table collisions</span>
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="history" className="flex-1 overflow-auto p-4">
+              <h3 className="font-medium mb-3">Recent Conversations</h3>
+              <div className="space-y-2">
+                <div className="flex items-center p-2 rounded-md bg-secondary cursor-pointer">
+                  <Clock className="h-4 w-4 mr-2" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">DSA Concepts</p>
+                    <p className="text-xs text-muted-foreground">Today, 10:30 AM</p>
+                  </div>
+                </div>
+                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                  <Clock className="h-4 w-4 mr-2" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">System Design Basics</p>
+                    <p className="text-xs text-muted-foreground">Yesterday, 3:45 PM</p>
+                  </div>
+                </div>
+                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                  <Clock className="h-4 w-4 mr-2" />
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">JavaScript Interview Prep</p>
+                    <p className="text-xs text-muted-foreground">Oct 10, 2023</p>
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </Card>
+
+        {/* Chat Interface */}
+        <Card className="lg:col-span-3 h-[calc(100vh-12rem)] flex flex-col">
+          <CardContent className="flex-1 overflow-hidden p-0 flex flex-col">
+            {/* Chat Header */}
+            <div className="p-4 border-b flex justify-between items-center">
+              <div className="flex items-center">
+                <Avatar className="h-8 w-8 mr-2">
+                  <AvatarImage src="/placeholder.svg?height=32&width=32" />
+                  <AvatarFallback>
+                    <Bot className="h-4 w-4" />
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <h3 className="font-medium">InterviewBuddy AI</h3>
+                  <p className="text-xs text-muted-foreground">Powered by your study materials</p>
+                </div>
+              </div>
+              <Button variant="ghost" size="icon" onClick={clearChat}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
-            <Button variant="ghost" size="icon" onClick={clearChat}>
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {error && !isLoading && (
-              <div className="flex justify-center">
-                <div className="p-3 bg-red-50 text-red-700 rounded-md flex items-center text-sm">
-                  <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-                  <span>{error}</span>
-                </div>
-              </div>
-            )}
-
-            {messages.map((message, index) => (
-              <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`flex max-w-[80%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
-                  <div className={`flex-shrink-0 ${message.role === "user" ? "ml-3" : "mr-3"}`}>
-                    <Avatar>
-                      <AvatarFallback>
-                        {message.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div>
-                    <div
-                      className={`rounded-lg p-3 ${
-                        message.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary"
-                      }`}
-                    >
-                      {message.role === 'assistant' ? (
-                        <ReactMarkdown
-                          components={{
-                            p: ({node, ...props}) => <p className="mb-2 last:mb-0" {...props} />,
-                            ul: ({node, ...props}) => <ul className="list-disc list-inside my-2" {...props} />,
-                            ol: ({node, ...props}) => <ol className="list-decimal list-inside my-2" {...props} />,
-                            li: ({node, ...props}) => <li className="mb-1" {...props} />,
-                            code: ({node, inline, ...props}) => 
-                              inline ? <code className="bg-muted px-1 py-0.5 rounded text-sm" {...props} /> 
-                                     : <pre className="bg-muted p-2 rounded overflow-x-auto text-sm my-2"><code {...props} /></pre>,
-                            a: ({node, ...props}) => <a className="text-primary underline hover:no-underline" target="_blank" rel="noopener noreferrer" {...props} />,
-                          }}
-                        >
-                          {message.content || ""}
-                        </ReactMarkdown>
-                      ) : (
-                        <div className="whitespace-pre-wrap">{message.content || ""}</div>
-                      )}
+            {/* Messages Container */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((message) => (
+                <div key={message.id} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div className={`flex max-w-[80%] ${message.role === "user" ? "flex-row-reverse" : "flex-row"}`}>
+                    <div className={`flex-shrink-0 ${message.role === "user" ? "ml-3" : "mr-3"}`}>
+                      <Avatar>
+                        <AvatarFallback>
+                          {message.role === "user" ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                        </AvatarFallback>
+                      </Avatar>
                     </div>
+                    <div>
+                      <div
+                        className={`rounded-lg p-3 ${
+                          message.role === "user" ? "bg-primary text-primary-foreground" : "bg-secondary"
+                        }`}
+                      >
+                        <div className="whitespace-pre-wrap">{message.content}</div>
 
-                    <div className="flex items-center mt-1 text-xs text-muted-foreground">
-                      <span>{formatTimestamp(message.timestamp)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
+                        {message.sources && (
+                          <div className="mt-2 pt-2 border-t border-border/30 flex flex-wrap gap-2">
+                            <span className="text-xs text-muted-foreground">Sources:</span>
+                            {message.sources.map((source, i) => (
+                              <Badge key={i} variant="outline" className="text-xs">
+                                <FileText className="h-3 w-3 mr-1" />
+                                {source}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
 
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="flex max-w-[80%]">
-                  <div className="flex-shrink-0 mr-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        <Bot className="h-4 w-4" />
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div>
-                    <div className="rounded-lg p-3 bg-secondary">
-                      <div className="flex space-x-2">
-                        <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
-                        <div
-                          className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"
-                          style={{ animationDelay: "0.2s" }}
-                        ></div>
-                        <div
-                          className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"
-                          style={{ animationDelay: "0.4s" }}
-                        ></div>
+                      <div className="flex items-center mt-1 text-xs text-muted-foreground">
+                        <span>{message.timestamp}</span>
+
+                        {message.role === "assistant" && (
+                          <div className="flex items-center ml-auto space-x-2">
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                              <ThumbsUp className="h-3 w-3" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                              <ThumbsDown className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              ))}
 
-            <div ref={messagesEndRef} />
-          </div>
+              {isTyping && (
+                <div className="flex justify-start">
+                  <div className="flex max-w-[80%]">
+                    <div className="flex-shrink-0 mr-3">
+                      <Avatar>
+                        <AvatarFallback>
+                          <Bot className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                    </div>
+                    <div>
+                      <div className="rounded-lg p-3 bg-secondary">
+                        <div className="flex space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
+                          <div
+                            className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"
+                            style={{ animationDelay: "0.2s" }}
+                          ></div>
+                          <div
+                            className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"
+                            style={{ animationDelay: "0.4s" }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-          <div className="p-4 border-t">
-            {!selectedDocument && (
-              <div className="text-center text-sm text-muted-foreground mb-2">
-                Please <Link href="/document-upload" className="underline text-primary">select a document</Link> to start chatting.
-              </div>
-            )}
-            <form onSubmit={handleSendMessage} className="flex space-x-2">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={selectedDocument 
-                  ? "Ask a question about your document..." 
-                  : "Select a document first"}
-                className="flex-1"
-                disabled={!selectedDocument || isLoading}
-              />
-              <Button 
-                type="submit" 
-                size="icon"
-                disabled={!selectedDocument || !input.trim() || isLoading}
-              >
-                <Send className="h-4 w-4" />
-              </Button>
-            </form>
-          </div>
-        </CardContent>
-      </Card>
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input Area */}
+            <div className="p-4 border-t">
+              <form onSubmit={handleSendMessage} className="flex space-x-2">
+                <Input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask a question about your study materials..."
+                  className="flex-1"
+                />
+                <Button type="submit" size="icon">
+                  <Send className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

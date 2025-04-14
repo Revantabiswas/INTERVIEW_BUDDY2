@@ -1,28 +1,35 @@
 import os
 from langchain_groq import ChatGroq
+from functools import lru_cache
 from crewai import Agent, Task, Crew, Process
-import logging
 
-# Setup basic logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# Replace Streamlit caching with Python's lru_cache
+@lru_cache(maxsize=1)
+def get_llm():
+    # Initialize Groq client
+    groq_api_key = os.environ.get("GROQ_API_KEY", "")
+    
+    # Configure the Groq LLM
+    llm = ChatGroq(
+        groq_api_key=groq_api_key,
+        model_name="groq/llama3-70b-8192",
+    )
+    return llm
 
-def get_llm(model_name="llama3-70b-8192"):
-    """Initializes and returns the Groq LLM client."""
-    groq_api_key = os.environ.get("GROQ_API_KEY")
-    if not groq_api_key:
-        logging.error("GROQ_API_KEY environment variable not set.")
-        raise ValueError("GROQ_API_KEY environment variable not set.")
+# Create a function for explanation tasks
+def create_explanation_task(agent, question, context):
+    return Task(
+        description=f"""Explain the following concept using clear, concise language. 
+        Break down complex ideas into manageable parts. Use analogies where helpful.
         
-    try:
-        llm = ChatGroq(
-            groq_api_key=groq_api_key,
-            model_name=model_name,
-        )
-        logging.info(f"Groq LLM initialized with model: {model_name}")
-        return llm
-    except Exception as e:
-        logging.error(f"Failed to initialize Groq LLM: {e}")
-        raise
+        Question: {question}
+        
+        Context information:
+        {context}
+        """,
+        expected_output="A clear explanation of the concept with examples and analogies if appropriate.",
+        agent=agent
+    )
 
 # CrewAI Agents and Tasks
 def create_study_tutor_agent():
@@ -187,20 +194,6 @@ def create_company_specific_agent():
                 "specific target companies.",
         llm=get_llm(),
         verbose=True
-    )
-
-def create_explanation_task(agent, question, context):
-    return Task(
-        description=f"""Explain the following concept using clear, concise language. 
-        Break down complex ideas into manageable parts. Use analogies where helpful.
-        
-        Question: {question}
-        
-        Context information:
-        {context}
-        """,
-        expected_output="A clear explanation of the concept with examples and analogies if appropriate.",
-        agent=agent
     )
 
 def create_notes_generation_task(agent, topic, context):
@@ -479,28 +472,18 @@ def create_mock_interview_task(agent, problem, difficulty, company_context=None)
     )
 
 def run_agent_task(agent, task):
-    """Execute a single agent task and return the result as a string."""
-    try:
-        crew = Crew(
-            agents=[agent],
-            tasks=[task],
-            verbose=True,
-            process=Process.sequential
-        )
-        
-        logging.info(f"Starting task: {task.description[:100]}...")
-        result = crew.kickoff()
-        logging.info("Task completed successfully.")
-        
-        if isinstance(result, dict) and 'raw_output' in result:
-            output = result.get('raw_output', str(result))
-        elif hasattr(result, 'raw_output') and result.raw_output:
-            output = result.raw_output
-        else:
-            output = str(result)
-            
-        return output
-
-    except Exception as e:
-        logging.error(f"Error running agent task: {e}", exc_info=True)
-        return f"An error occurred during task execution: {e}"
+    """Execute a single agent task and return the result"""
+    crew = Crew(
+        agents=[agent],
+        tasks=[task],
+        verbose=True,
+        process=Process.sequential
+    )
+    
+    result = crew.kickoff()
+    
+    # Handle different result types
+    if hasattr(result, 'raw_output'):
+        return result.raw_output
+    else:
+        return str(result)

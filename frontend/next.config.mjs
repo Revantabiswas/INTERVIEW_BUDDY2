@@ -21,21 +21,6 @@ const nextConfig = {
     parallelServerBuildTraces: true,
     parallelServerCompiles: true,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: 'http://localhost:8000/api/:path*', // This connects to frontend/backend
-      },
-    ];
-  },
-  // Add this to help with debugging API issues
-  webpack: (config, { dev }) => {
-    if (dev) {
-      config.devtool = 'cheap-module-source-map';
-    }
-    return config;
-  },
 }
 
 mergeConfig(nextConfig, userConfig)

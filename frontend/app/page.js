@@ -1,171 +1,151 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { api } from "@/lib/api"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { AlertCircle, CheckCircle, BookOpen, FileText, BrainCircuit, FlaskConical } from "lucide-react"
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Code, FileUp, MessageSquare, BookOpen, Network, Calendar, FileCode } from "lucide-react"
 
 export default function Home() {
-  const [backendStatus, setBackendStatus] = useState('checking')
-  const [errorMessage, setErrorMessage] = useState('')
-
-  useEffect(() => {
-    // Test API connectivity on component mount
-    testBackendConnection()
-  }, [])
-
-  const testBackendConnection = async () => {
-    try {
-      setBackendStatus('checking')
-      setErrorMessage('')
-      
-      // Try to fetch documents list as a connectivity test
-      await api.documents.getAll()
-      
-      // If we get here, the connection is working
-      setBackendStatus('connected')
-    } catch (error) {
-      console.error("Backend connection failed:", error)
-      setBackendStatus('error')
-      
-      // Determine appropriate error message
-      if (error.message && error.message.includes('Network Error')) {
-        setErrorMessage('Cannot connect to backend server. Please ensure the backend is running at ' + 
-          (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'))
-      } else {
-        setErrorMessage(error.userMessage || error.message || 'Unknown connection error')
-      }
-    }
-  }
+  const features = [
+    {
+      icon: Code,
+      title: "DSA Practice Questions",
+      description: "Practice Data Structures & Algorithms with curated questions by difficulty and topic.",
+      href: "/dsa-practice",
+    },
+    {
+      icon: FileUp,
+      title: "Document Upload",
+      description: "Upload study materials in PDF, DOCX, or TXT format for AI processing.",
+      href: "/document-upload",
+    },
+    {
+      icon: MessageSquare,
+      title: "AI-Powered Chat",
+      description: "Get instant answers to your technical questions with our AI assistant.",
+      href: "/ai-chat",
+    },
+    {
+      icon: BookOpen,
+      title: "Study Notes Generator",
+      description: "Generate concise, well-structured notes from your uploaded documents.",
+      href: "/study-notes",
+    },
+    {
+      icon: Network,
+      title: "Mind Map Generator",
+      description: "Visualize concepts and their relationships in interactive mind maps.",
+      href: "/mind-maps",
+    },
+    {
+      icon: Calendar,
+      title: "Study Roadmap",
+      description: "Get a personalized study plan based on your goals and timeline.",
+      href: "/study-roadmap",
+    },
+    {
+      icon: FileCode,
+      title: "Code Debugging",
+      description: "Get AI-powered feedback and debugging tips for your code.",
+      href: "/code-debugging",
+    },
+  ]
 
   return (
-    <div className="container mx-auto px-4 py-12">
-      <div className="flex flex-col items-center justify-center text-center">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Interview Buddy
-        </h1>
-        <p className="mt-4 text-xl text-muted-foreground max-w-3xl">
-          Your AI-powered learning companion to help you ace technical interviews
-        </p>
-        
-        <div className="mt-6">
-          {backendStatus === 'checking' && (
-            <Badge variant="outline" className="animate-pulse">
-              <div className="mr-1 h-2 w-2 rounded-full bg-blue-500 animate-pulse"></div>
-              Checking backend connection...
-            </Badge>
-          )}
-          
-          {backendStatus === 'connected' && (
-            <Badge className="bg-green-100 text-green-800">
-              <CheckCircle className="mr-1 h-4 w-4" />
-              Backend connected
-            </Badge>
-          )}
-          
-          {backendStatus === 'error' && (
-            <div className="flex flex-col items-center gap-2">
-              <Badge variant="destructive">
-                <AlertCircle className="mr-1 h-4 w-4" />
-                Backend connection failed
-              </Badge>
-              <p className="text-sm text-destructive">{errorMessage}</p>
-              <Button 
-                size="sm" 
-                variant="outline" 
-                onClick={testBackendConnection}
-                className="mt-2"
-              >
-                Retry Connection
-              </Button>
-            </div>
-          )}
+    <div className="container mx-auto px-4 py-8">
+      {/* 3D Hero Section */}
+      <section className="relative py-20 md:py-32 overflow-hidden">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background"></div>
+
+        {/* 3D Floating Elements */}
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary/5 blur-3xl animate-float"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-primary/5 blur-3xl animate-float-delay"></div>
+
+        {/* 3D Geometric Shapes */}
+        <div className="absolute top-20 left-[10%] w-16 h-16 rounded-lg border border-primary/20 transform rotate-12 animate-spin-slow"></div>
+        <div className="absolute bottom-20 right-[10%] w-20 h-20 rounded-full border border-primary/20 animate-bounce-slow"></div>
+        <div className="absolute top-1/3 right-[20%] w-12 h-12 rounded-md border border-primary/20 transform rotate-45 animate-pulse"></div>
+
+        <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 tracking-tight animate-text-reveal">
+            Ace Your Technical Interviews with{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70">
+              InterviewBuddy AI
+            </span>
+          </h1>
+          <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-8 animate-text-reveal-delay">
+            Your AI-powered companion for interview preparation, coding challenges, and technical exams.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4 animate-fade-in-up">
+            <Button size="lg" className="shadow-lg hover:shadow-xl transition-all" asChild>
+              <Link href="/dsa-practice">Start Practicing DSA</Link>
+            </Button>
+            <Button size="lg" variant="outline" className="shadow-md hover:shadow-lg transition-all" asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <BookOpen className="mr-2 h-5 w-5" />
-              Study Materials
-            </CardTitle>
-            <CardDescription>Upload and manage your study documents</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Upload PDFs, DOCX, and TXT files to create personalized study materials. Our AI will process your documents so you can interact with them intelligently.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button className="w-full" variant="secondary" disabled={backendStatus !== 'connected'} asChild>
-              <a href="/document-upload">Upload Documents</a>
-            </Button>
-          </CardFooter>
-        </Card>
+        {/* 3D Code Blocks */}
+        <div className="hidden lg:block absolute -left-20 top-1/3 w-64 h-40 bg-card/80 backdrop-blur-sm border border-border rounded-lg shadow-xl transform -rotate-12 animate-float-delay">
+          <div className="p-4 font-mono text-xs opacity-70">
+            <div className="text-primary">function</div>
+            <div className="pl-2">
+              <span className="text-primary">binarySearch</span>
+              <span>(arr, target) {`{`}</span>
+            </div>
+            <div className="pl-4">// Implementation</div>
+            <div className="pl-2">{`}`}</div>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <FileText className="mr-2 h-5 w-5" />
-              Smart Notes
-            </CardTitle>
-            <CardDescription>Generate organized study notes</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Transform your documents into well-structured study notes. Organize complex topics into easy-to-review summaries with key concepts highlighted.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button className="w-full" variant="secondary" disabled={backendStatus !== 'connected'} asChild>
-              <a href="/study-notes">Generate Notes</a>
-            </Button>
-          </CardFooter>
-        </Card>
+        <div className="hidden lg:block absolute -right-20 top-2/3 w-64 h-40 bg-card/80 backdrop-blur-sm border border-border rounded-lg shadow-xl transform rotate-12 animate-float">
+          <div className="p-4 font-mono text-xs opacity-70">
+            <div className="text-primary">class</div>
+            <div className="pl-2">
+              <span className="text-primary">TreeNode</span>
+              <span> {`{`}</span>
+            </div>
+            <div className="pl-4">// Properties</div>
+            <div className="pl-2">{`}`}</div>
+          </div>
+        </div>
+      </section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <BrainCircuit className="mr-2 h-5 w-5" />
-              AI Chat
-            </CardTitle>
-            <CardDescription>Chat with your documents</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Ask questions about your uploaded materials and get instant answers. Clarify concepts, dive deeper into topics, and test your understanding through conversation.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button className="w-full" variant="secondary" disabled={backendStatus !== 'connected'} asChild>
-              <a href="/ai-chat">Start Chatting</a>
-            </Button>
-          </CardFooter>
-        </Card>
+      {/* Features Section */}
+      <section className="py-16">
+        <h2 className="text-3xl font-bold text-center mb-12">Key Features</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {features.map((feature, index) => (
+            <Card
+              key={index}
+              className="slide-in transform-3d hover:rotate-y-5 transition-all duration-300 hover:shadow-lg"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <CardHeader>
+                <feature.icon className="h-10 w-10 text-primary mb-2" />
+                <CardTitle>{feature.title}</CardTitle>
+                <CardDescription>{feature.description}</CardDescription>
+              </CardHeader>
+              <CardFooter>
+                <Button variant="outline" asChild className="w-full">
+                  <Link href={feature.href}>Explore</Link>
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
+        </div>
+      </section>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <FlaskConical className="mr-2 h-5 w-5" />
-              DSA Practice
-            </CardTitle>
-            <CardDescription>Practice coding problems</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              Prepare for technical interviews with our curated collection of data structures and algorithms problems. Get AI-powered hints and solution analysis.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button className="w-full" variant="secondary" disabled={backendStatus !== 'connected'} asChild>
-              <a href="/dsa-practice">Start Practicing</a>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
+      {/* CTA Section */}
+      <section className="py-16 text-center bg-gradient-to-br from-primary/5 via-secondary to-primary/5 rounded-lg p-8 mt-8 transform-3d hover:rotate-y-2 transition-all duration-500">
+        <h2 className="text-3xl font-bold mb-6">Ready to Boost Your Interview Preparation?</h2>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+          Join thousands of students and professionals who have improved their technical interview skills with
+          InterviewBuddy AI.
+        </p>
+        <Button size="lg" className="shadow-lg hover:shadow-xl transition-all" asChild>
+          <Link href="/login">Get Started Now</Link>
+        </Button>
+      </section>
     </div>
   )
 }
