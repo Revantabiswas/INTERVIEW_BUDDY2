@@ -1,451 +1,232 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { motion } from "framer-motion"
+import Image from "next/image"
 import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Github, Twitter, Loader2, Code, Braces, Terminal, Hash } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [isMounted, setIsMounted] = useState(false)
-  const [codeElements, setCodeElements] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [showContent, setShowContent] = useState(false)
   const router = useRouter()
+  const { toast } = useToast()
 
-  // Set mounted state when component mounts on client
+  // Animation to reveal content after page load
   useEffect(() => {
-    setIsMounted(true)
-    
-    // Generate more varied animated elements
-    const elements = Array.from({ length: 15 }, (_, i) => ({
-      id: i,
-      left: `${Math.random() * 100}%`,
-      top: `${Math.random() * 100}%`,
-      size: `${Math.random() * 1.5 + 0.8}rem`,
-      delay: `${i * 0.3}s`,
-      duration: `${Math.random() * 10 + 10}s`,
-      type: ['code', 'braces', 'terminal', 'hash'][i % 4]
-    }));
-    setCodeElements(elements);
-  }, []);
+    const timer = setTimeout(() => {
+      setShowContent(true)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate login process
+    // For this MVP design, we'll just simulate a login with a timeout
+    // and then redirect to the main page
     setTimeout(() => {
       setIsLoading(false)
+      toast({
+        title: "Login successful",
+        description: "Welcome back!",
+      })
       router.push("/")
     }, 1500)
   }
 
-  // Early return for server rendering
-  if (!isMounted) {
-    return (
-      <div className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-background via-background to-background/80 p-4">
-        <div className="w-full max-w-md">
-          <div className="rounded-xl border bg-card p-6 shadow-xl">
-            <div className="mb-6 flex flex-col items-center space-y-2 text-center">
-              <h1 className="text-3xl font-bold tracking-tight">Interview Buddy AI</h1>
-              <p className="text-sm text-muted-foreground">Your AI-powered interview preparation assistant</p>
-            </div>
-            <div className="flex justify-center p-8">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="relative flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-slate-900 via-background to-indigo-900/20 p-4 overflow-hidden">
-      {/* Animated background */}
-      <div className="animated-bg"></div>
-      
-      {/* Floating coding elements - with more variety */}
-      {codeElements.map((element) => (
-        <div 
-          key={element.id} 
-          className="absolute text-primary/20 code-element z-0"
-          style={{
-            left: element.left,
-            top: element.top,
-            fontSize: element.size,
-            animationDelay: element.delay,
-            animationDuration: element.duration
-          }}
-        >
-          {element.type === 'code' && <Code />}
-          {element.type === 'braces' && <Braces />}
-          {element.type === 'terminal' && <Terminal />}
-          {element.type === 'hash' && <Hash />}
-        </div>
-      ))}
-      
-      <div className="w-full max-w-md z-10">
-        <div 
-          className="relative rounded-xl border bg-card/90 backdrop-blur-sm p-6 shadow-xl transition-all duration-300 hover:shadow-primary/10 hover:shadow-2xl"
-        >
-          {/* Background effects */}
-          <div className="absolute -left-4 -top-4 h-24 w-24 rounded-full bg-primary/20 blur-3xl animate-pulse"></div>
-          <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-indigo-500/20 blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-
-          {/* App logo and name with improved animations */}
-          <div className="mb-6 flex flex-col items-center space-y-4 text-center">
-            <div className="logo-animation">
-              <div className="logo-icons">
-                <Code className="logo-icon" />
-                <Braces className="logo-icon" />
-                <Terminal className="logo-icon" />
+    <div className="flex h-screen w-full overflow-hidden">
+      {/* Left side - Image with enhanced content */}
+      <motion.div
+        className="hidden md:block md:w-1/2 relative bg-gray-900"
+        initial={{ x: "-100%" }}
+        animate={{ x: showContent ? 0 : "-100%" }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      >
+        <Image
+          src="/login.jpg"
+          alt="Study workspace"
+          fill
+          style={{ objectFit: "cover" }}
+          priority
+          className="opacity-80"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-transparent flex flex-col justify-center p-12">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 20 }}
+            transition={{ delay: 0.5 }}
+          >
+            <h1 className="text-4xl font-bold text-white mb-6">
+              Ace Your Technical Interviews
+            </h1>
+            <p className="text-xl text-white/90 max-w-md leading-relaxed">
+              Transform the way you prepare with personalized AI-powered practice sessions, curated study paths, and real-time feedback.
+            </p>
+            
+            <div className="mt-10">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-primary/20 p-2 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                    <path d="m16 6 4 14"></path><path d="M12 6v14"></path><path d="M8 8v12"></path><path d="M4 4v16"></path>
+                  </svg>
+                </div>
+                <span className="text-white/90">Track your progress over time</span>
+              </div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-primary/20 p-2 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
+                <span className="text-white/90">Access curated study materials</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="bg-primary/20 p-2 rounded-full">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </div>
+                <span className="text-white/90">Practice with AI mock interviews</span>
               </div>
             </div>
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tight text-gradient animate-gradient">Interview Buddy AI</h1>
-              <p className="text-sm text-muted-foreground animate-fade-in">Your AI-powered interview preparation assistant</p>
-            </div>
-          </div>
-
-          <Tabs defaultValue="email" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6 tab-glow">
-              <TabsTrigger value="email" className="tab-trigger">Email</TabsTrigger>
-              <TabsTrigger value="social" className="tab-trigger">Social Login</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="email" className="space-y-4 animate-slide-up">
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="name@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="transition-all duration-300 focus:shadow-md focus:border-primary input-glow"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                    <Link href="/forgot-password" className="text-xs text-primary hover:underline hover:text-primary/80 transition-colors">
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="transition-all duration-300 focus:shadow-md focus:border-primary input-glow"
-                  />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="remember" className="checkbox-glow" />
-                  <Label htmlFor="remember" className="text-sm font-normal">
-                    Remember me for 30 days
-                  </Label>
-                </div>
-
-                <Button type="submit" className="w-full animated-button" disabled={isLoading}>
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    "Sign in"
-                  )}
-                  <span className="button-glow"></span>
-                </Button>
-              </form>
-            </TabsContent>
-
-            <TabsContent value="social" className="space-y-4 animate-slide-up">
-              <Button variant="outline" className="w-full social-button github-button" onClick={() => setIsLoading(true)}>
-                <Github className="mr-2 h-4 w-4" />
-                Continue with GitHub
-              </Button>
-
-              <Button variant="outline" className="w-full social-button twitter-button" onClick={() => setIsLoading(true)}>
-                <Twitter className="mr-2 h-4 w-4" />
-                Continue with Twitter
-              </Button>
-            </TabsContent>
-          </Tabs>
-
-          <div className="mt-6 text-center text-sm animate-fade-in" style={{animationDelay: '0.5s'}}>
-            Don't have an account?{" "}
-            <Link href="/signup" className="font-medium text-primary hover:underline hover:text-primary/80 transition-colors">
-              Sign up
-            </Link>
-          </div>
-
-          {/* Animated elements */}
-          <div className="typing-cursor"></div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
-      <style jsx global>{`
-        /* Remove 3D perspective styles */
-        
-        .text-gradient {
-          background: linear-gradient(to right, #3b82f6, #8b5cf6);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        
-        .animate-gradient {
-          background-size: 200% auto;
-          animation: shine 3s linear infinite;
-        }
-        
-        @keyframes shine {
-          to {
-            background-position: 200% center;
-          }
-        }
-        
-        /* More animated button styles */
-        .animated-button {
-          position: relative;
-          overflow: hidden;
-          background: linear-gradient(90deg, #3b82f6, #8b5cf6, #3b82f6);
-          background-size: 200% 100%;
-          animation: gradient-shift 3s ease infinite;
-          border: none;
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .animated-button:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
-        }
-        
-        .animated-button:active:not(:disabled) {
-          transform: translateY(1px);
-        }
-        
-        @keyframes gradient-shift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        
-        .button-glow {
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.2),
-            transparent
-          );
-          animation: button-glow 2s infinite;
-        }
-        
-        @keyframes button-glow {
-          0% { transform: translateX(-100%); }
-          100% { transform: translateX(100%); }
-        }
-        
-        .input-glow {
-          transition: all 0.3s ease;
-        }
-        
-        .input-glow:focus {
-          box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
-          border-color: #3b82f6;
-        }
-        
-        .tab-glow {
-          position: relative;
-          overflow: hidden;
-          box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
-        }
-        
-        .tab-trigger {
-          position: relative;
-          overflow: hidden;
-          z-index: 1;
-          transition: all 0.3s ease;
-        }
-        
-        .tab-trigger[data-state="active"]::before {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 2px;
-          background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-          animation: tab-active 0.3s forwards;
-        }
-        
-        @keyframes tab-active {
-          from { transform: scaleX(0); }
-          to { transform: scaleX(1); }
-        }
-        
-        .checkbox-glow:checked {
-          background-color: #3b82f6;
-          animation: checkbox-pulse 0.5s;
-        }
-        
-        @keyframes checkbox-pulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
-          50% { box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
-        }
-        
-        /* More animations for code elements */
-        .code-element {
-          opacity: 0.4;
-          animation: float-around 20s linear infinite;
-          filter: drop-shadow(0 0 2px rgba(59, 130, 246, 0.3));
-        }
-        
-        @keyframes float-around {
-          0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; }
-          10% { opacity: 0.2; }
-          90% { opacity: 0.2; }
-          100% { transform: translateY(-100px) translateX(100px) rotate(360deg); opacity: 0; }
-        }
-        
-        .animated-bg {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          opacity: 0.1;
-          background: 
-            linear-gradient(125deg, #3b82f6 0%, transparent 40%),
-            linear-gradient(45deg, #8b5cf6 0%, transparent 40%),
-            linear-gradient(315deg, #06b6d4 0%, transparent 40%);
-          background-size: 200% 200%;
-          animation: gradient-animation 15s ease infinite;
-        }
-        
-        @keyframes gradient-animation {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        
-        /* Logo animation */
-        .logo-animation {
-          position: relative;
-          width: 60px;
-          height: 60px;
-          border-radius: 50%;
-          background: linear-gradient(45deg, #3b82f6, #8b5cf6);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
-        }
-        
-        .logo-icons {
-          position: relative;
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          background-color: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          overflow: hidden;
-        }
-        
-        .logo-icon {
-          position: absolute;
-          width: 24px;
-          height: 24px;
-          color: #3b82f6;
-          opacity: 0;
-          animation: logo-cycle 6s infinite;
-        }
-        
-        .logo-icon:nth-child(1) { animation-delay: 0s; }
-        .logo-icon:nth-child(2) { animation-delay: 2s; }
-        .logo-icon:nth-child(3) { animation-delay: 4s; }
-        
-        @keyframes logo-cycle {
-          0%, 20% { opacity: 0; transform: scale(0.8); }
-          30%, 70% { opacity: 1; transform: scale(1); }
-          80%, 100% { opacity: 0; transform: scale(0.8); }
-        }
-        
-        /* Social buttons animation */
-        .social-button {
-          position: relative;
-          overflow: hidden;
-          transition: all 0.3s ease;
-        }
-        
-        .github-button:hover {
-          background-color: #24292e;
-          color: white;
-          border-color: #24292e;
-        }
-        
-        .twitter-button:hover {
-          background-color: #1DA1F2;
-          color: white;
-          border-color: #1DA1F2;
-        }
-        
-        /* Typing cursor effect */
-        .typing-cursor {
-          position: absolute;
-          bottom: 8px;
-          right: 8px;
-          width: 8px;
-          height: 16px;
-          background-color: #3b82f6;
-          opacity: 0.7;
-          animation: cursor-blink 1s step-end infinite;
-        }
-        
-        @keyframes cursor-blink {
-          0%, 100% { opacity: 0; }
-          50% { opacity: 0.7; }
-        }
-        
-        /* Slide up and fade in animations */
-        .animate-slide-up {
-          animation: slide-up 0.5s ease-out forwards;
-        }
-        
-        @keyframes slide-up {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .animate-fade-in {
-          animation: fade-in 0.5s ease-out forwards;
-        }
-        
-        @keyframes fade-in {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-      `}</style>
+      {/* Right side - Login Form with Interview Buddy logo */}
+      <motion.div
+        className="w-full md:w-1/2 flex items-center justify-center p-8 bg-background"
+        initial={{ x: "100%" }}
+        animate={{ x: showContent ? 0 : "100%" }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      >
+        <div className="w-full max-w-md">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: showContent ? 1 : 0, y: showContent ? 0 : 20 }}
+            transition={{ delay: 0.7 }}
+          >
+            <div className="flex flex-col items-center mb-8">
+              <div className="relative mb-2">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center shadow-lg">
+                  <span className="text-2xl font-bold text-white">IB</span>
+                </div>
+                <div className="absolute -inset-1 rounded-full bg-primary/20 -z-10 animate-pulse-slow blur-md"></div>
+              </div>
+              <h1 className="text-3xl font-bold mt-2">
+                <span className="bg-gradient-to-r from-cyan-500 to-blue-600 text-transparent bg-clip-text">Interview</span>
+                <span className="text-foreground ml-1">Buddy AI</span>
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">Your AI-powered interview preparation companion</p>
+            </div>
+            
+            <Card className="border-muted/30 shadow-lg">
+              <CardHeader>
+                <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
+                <CardDescription className="text-center">
+                  Sign in to continue your interview preparation
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="border-input/60"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label htmlFor="password">Password</Label>
+                      <Link
+                        href="/forgot-password"
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="border-input/60"
+                    />
+                  </div>
+                  <Button 
+                    className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 transition-all" 
+                    type="submit" 
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <span>Signing in...</span>
+                      </div>
+                    ) : "Sign In"}
+                  </Button>
+                </form>
+              </CardContent>
+              <CardFooter className="flex flex-col gap-4">
+                <div className="relative w-full">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-muted"></div>
+                  </div>
+                  <div className="relative flex justify-center text-xs">
+                    <span className="bg-card px-2 text-muted-foreground">or continue with</span>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-2 w-full">
+                  <Button variant="outline" className="gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"></path>
+                    </svg>
+                    GitHub
+                  </Button>
+                  <Button variant="outline" className="gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                    </svg>
+                    Facebook
+                  </Button>
+                </div>
+                
+                <p className="text-center text-sm">
+                  Don't have an account?{" "}
+                  <Link href="/signup" className="text-primary hover:underline font-medium">
+                    Sign up
+                  </Link>
+                </p>
+              </CardFooter>
+            </Card>
+          </motion.div>
+        </div>
+      </motion.div>
     </div>
   )
 }

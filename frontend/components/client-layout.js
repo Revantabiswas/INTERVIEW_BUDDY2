@@ -6,9 +6,9 @@ import UserAvatar from "@/components/user-avatar"
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname()
-  const isLoginPage = pathname === "/login" || pathname === "/register"
+  const isFullScreenPage = pathname === "/login" || pathname === "/register" || pathname === "/splash"
   
-  if (isLoginPage) {
+  if (isFullScreenPage) {
     return (
       <main className="flex-1 overflow-auto">
         {children}

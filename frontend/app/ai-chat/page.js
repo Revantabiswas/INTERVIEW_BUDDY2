@@ -7,37 +7,54 @@ import { Input } from "@/components/ui/input"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Send, Bot, User, Clock, FileText, Lightbulb, Trash2, Copy, ThumbsUp, ThumbsDown } from "lucide-react"
+import { useToast } from "@/components/ui/use-toast"
+import {
+  Send,
+  Bot,
+  User,
+  Clock,
+  FileText,
+  Lightbulb,
+  Trash2,
+  Copy,
+  ThumbsUp,
+  ThumbsDown,
+  Loader2,
+} from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 
-// Mock chat history
+// Import DocumentSelector component
+import { DocumentSelector } from "@/components/DocumentSelector"
+import { documentApi, chatApi } from "@/lib/api"
+import { Message } from "@/components/Message"
+import { LoadingSpinner } from "@/components/LoadingSpinner"
+
+// Initial welcome message
 const initialMessages = [
   {
     id: 1,
     role: "assistant",
     content: "Hello! I'm your InterviewBuddy AI assistant. How can I help with your interview preparation today?",
-    timestamp: "10:30 AM",
-  },
-  {
-    id: 2,
-    role: "user",
-    content: "Can you explain time complexity in Big O notation?",
-    timestamp: "10:31 AM",
-  },
-  {
-    id: 3,
-    role: "assistant",
-    content:
-      "Big O notation is used to describe the performance or complexity of an algorithm. It specifically describes the worst-case scenario and can be used to describe the execution time required or the space used by an algorithm.\n\nHere are the common Big O notations:\n\n- O(1): Constant time complexity. The algorithm takes the same amount of time regardless of input size.\n- O(log n): Logarithmic time complexity. The algorithm's time increases logarithmically as input size grows.\n- O(n): Linear time complexity. The algorithm's time increases linearly with input size.\n- O(n log n): Linearithmic time complexity. Common in efficient sorting algorithms like merge sort.\n- O(n²): Quadratic time complexity. Often seen in algorithms with nested loops.\n- O(2^n): Exponential time complexity. The algorithm's time doubles with each addition to the input.\n\nWould you like me to provide examples of algorithms for each of these time complexities?",
-    timestamp: "10:32 AM",
-    sources: ["Data Structures Notes.pdf", "Algorithm Cheat Sheet.docx"],
+    timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
   },
 ]
 
 export default function AIChat() {
   const [messages, setMessages] = useState(initialMessages)
   const [input, setInput] = useState("")
-  const [isTyping, setIsTyping] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [documents, setDocuments] = useState([])
+  const [selectedDocuments, setSelectedDocuments] = useState([])
+  const [isLoadingDocuments, setIsLoadingDocuments] = useState(true)
   const messagesEndRef = useRef(null)
+  const { toast } = useToast()
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -47,9 +64,31 @@ export default function AIChat() {
     scrollToBottom()
   }, [messages])
 
-  const handleSendMessage = (e) => {
+  // Load documents on component mount
+  useEffect(() => {
+    const loadDocuments = async () => {
+      try {
+        setIsLoadingDocuments(true)
+        const docs = await chatApi.getDocuments()
+        setDocuments(docs)
+      } catch (error) {
+        console.error("Error loading documents:", error)
+        toast({
+          title: "Error",
+          description: "Failed to load documents. Please try again later.",
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoadingDocuments(false)
+      }
+    }
+
+    loadDocuments()
+  }, [])
+
+  const handleSendMessage = async (e) => {
     e.preventDefault()
-    if (!input.trim()) return
+    if (!input.trim() || isLoading) return
 
     // Add user message
     const userMessage = {
@@ -59,26 +98,43 @@ export default function AIChat() {
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     }
 
-    setMessages([...messages, userMessage])
+    setMessages((prev) => [...prev, userMessage])
     setInput("")
-    setIsTyping(true)
+    setIsLoading(true)
 
-    // Simulate AI response after a delay
-    setTimeout(() => {
+    try {
+      // Format history for API
+      const history = messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }))
+
+      // Get document IDs from selected documents
+      const documentIds = selectedDocuments.map(doc => doc.id)
+
+      // Call API to get response - using chatApi.askQuestion even for general questions
+      const response = await chatApi.askQuestion(input, history, documentIds)
+      
+      // Add AI response to messages
       const aiMessage = {
         id: messages.length + 2,
         role: "assistant",
-        content:
-          "I'm simulating an AI response to your question about: " +
-          input +
-          "\n\nThis is where the actual AI-generated content would appear based on your uploaded documents and the context of your conversation.",
+        content: response.content,
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        sources: ["Data Structures Notes.pdf"],
+        sources: response.sources || []
       }
 
       setMessages((prev) => [...prev, aiMessage])
-      setIsTyping(false)
-    }, 1500)
+    } catch (error) {
+      console.error("Error sending message:", error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to get response. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const clearChat = () => {
@@ -94,7 +150,21 @@ export default function AIChat() {
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
-    // You could add a toast notification here
+    toast({
+      title: "Copied",
+      description: "Text copied to clipboard",
+    })
+  }
+
+  const toggleDocumentSelection = (document) => {
+    setSelectedDocuments(prev => {
+      const isSelected = prev.some(doc => doc.id === document.id)
+      if (isSelected) {
+        return prev.filter(doc => doc.id !== document.id)
+      } else {
+        return [...prev, document]
+      }
+    })
   }
 
   return (
@@ -116,32 +186,70 @@ export default function AIChat() {
 
             <TabsContent value="documents" className="flex-1 overflow-auto p-4">
               <h3 className="font-medium mb-3">Available Documents</h3>
-              <div className="space-y-2">
-                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
-                  <FileText className="h-4 w-4 mr-2 text-blue-500" />
-                  <span className="text-sm">Data Structures Notes.pdf</span>
+              
+              {isLoadingDocuments ? (
+                <div className="flex items-center justify-center py-4">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <span className="ml-2 text-sm text-muted-foreground">Loading documents...</span>
                 </div>
-                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
-                  <FileText className="h-4 w-4 mr-2 text-blue-500" />
-                  <span className="text-sm">Algorithm Cheat Sheet.docx</span>
+              ) : documents.length === 0 ? (
+                <div className="text-center py-4 text-sm text-muted-foreground">
+                  No documents available. Upload documents to use them for context.
                 </div>
-                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
-                  <FileText className="h-4 w-4 mr-2 text-gray-500" />
-                  <span className="text-sm">System Design Interview.txt</span>
+              ) : (
+                <div className="space-y-2">
+                  {documents.map((doc) => (
+                    <div 
+                      key={doc.id}
+                      className={`flex items-center p-2 rounded-md cursor-pointer ${
+                        selectedDocuments.some(d => d.id === doc.id) 
+                          ? "bg-primary/10 border border-primary/20" 
+                          : "hover:bg-secondary"
+                      }`}
+                      onClick={() => toggleDocumentSelection(doc)}
+                    >
+                      <FileText className="h-4 w-4 mr-2 text-blue-500" />
+                      <span className="text-sm">{doc.filename}</span>
+                    </div>
+                  ))}
                 </div>
-              </div>
+              )}
+
+              {selectedDocuments.length > 0 && (
+                <div className="mt-4 p-2 bg-primary/5 rounded-md">
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Using {selectedDocuments.length} document{selectedDocuments.length !== 1 ? 's' : ''} for context
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedDocuments.map(doc => (
+                      <Badge key={doc.id} variant="outline" className="text-xs">
+                        {doc.filename}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <h3 className="font-medium mt-6 mb-3">Suggested Questions</h3>
               <div className="space-y-2">
-                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                <div 
+                  className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer"
+                  onClick={() => setInput("Explain merge sort vs quick sort")}
+                >
                   <Lightbulb className="h-4 w-4 mr-2 text-yellow-500" />
                   <span className="text-sm">Explain merge sort vs quick sort</span>
                 </div>
-                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                <div 
+                  className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer"
+                  onClick={() => setInput("What is dynamic programming?")}
+                >
                   <Lightbulb className="h-4 w-4 mr-2 text-yellow-500" />
                   <span className="text-sm">What is dynamic programming?</span>
                 </div>
-                <div className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer">
+                <div 
+                  className="flex items-center p-2 rounded-md hover:bg-secondary cursor-pointer"
+                  onClick={() => setInput("Explain hash table collisions")}
+                >
                   <Lightbulb className="h-4 w-4 mr-2 text-yellow-500" />
                   <span className="text-sm">Explain hash table collisions</span>
                 </div>
@@ -191,7 +299,11 @@ export default function AIChat() {
                 </Avatar>
                 <div>
                   <h3 className="font-medium">InterviewBuddy AI</h3>
-                  <p className="text-xs text-muted-foreground">Powered by your study materials</p>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedDocuments.length > 0 
+                      ? `Using ${selectedDocuments.length} document${selectedDocuments.length !== 1 ? 's' : ''} for context` 
+                      : "Select documents to use as context"}
+                  </p>
                 </div>
               </div>
               <Button variant="ghost" size="icon" onClick={clearChat}>
@@ -219,7 +331,7 @@ export default function AIChat() {
                       >
                         <div className="whitespace-pre-wrap">{message.content}</div>
 
-                        {message.sources && (
+                        {message.sources && message.sources.length > 0 && (
                           <div className="mt-2 pt-2 border-t border-border/30 flex flex-wrap gap-2">
                             <span className="text-xs text-muted-foreground">Sources:</span>
                             {message.sources.map((source, i) => (
@@ -237,7 +349,12 @@ export default function AIChat() {
 
                         {message.role === "assistant" && (
                           <div className="flex items-center ml-auto space-x-2">
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              className="h-6 w-6"
+                              onClick={() => copyToClipboard(message.content)}
+                            >
                               <Copy className="h-3 w-3" />
                             </Button>
                             <Button variant="ghost" size="icon" className="h-6 w-6">
@@ -254,7 +371,7 @@ export default function AIChat() {
                 </div>
               ))}
 
-              {isTyping && (
+              {isLoading && (
                 <div className="flex justify-start">
                   <div className="flex max-w-[80%]">
                     <div className="flex-shrink-0 mr-3">
@@ -294,9 +411,10 @@ export default function AIChat() {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask a question about your study materials..."
                   className="flex-1"
+                  disabled={isLoading}
                 />
-                <Button type="submit" size="icon">
-                  <Send className="h-4 w-4" />
+                <Button type="submit" size="icon" disabled={isLoading || !input.trim()}>
+                  {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </Button>
               </form>
             </div>

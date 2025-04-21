@@ -31,11 +31,12 @@ const navItems = [
   { name: "AI Chat", href: "/ai-chat", icon: MessageSquare },
   { name: "Study Notes", href: "/study-notes", icon: BookOpen },
   { name: "Flashcards", href: "/flashcards", icon: BookMarked },
-  { name: "Mind Maps", href: "/mind-maps", icon: Network },
+  // { name: "Mind Maps", href: "/mind-maps", icon: Network },
   { name: "Study Roadmap", href: "/study-roadmap", icon: Map },
   { name: "Practice Tests", href: "/practice-tests", icon: FlaskConical },
-  { name: "Code Debugging", href: "/code-debugging", icon: FileCode },
-  { name: "Progress Tracking", href: "/progress", icon: BarChart2 },
+  { name: "Splash Screen", href: "/splash", icon: Layers },
+  // { name: "Code Debugging", href: "/code-debugging", icon: FileCode },
+  // { name: "Progress Tracking", href: "/progress", icon: BarChart2 },
   { name: "Settings", href: "/settings", icon: Settings },
 ]
 

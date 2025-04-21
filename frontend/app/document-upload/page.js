@@ -31,6 +31,7 @@ import {
 
 // Import DocumentSelector component
 import { DocumentSelector } from "@/components/DocumentSelector"
+import { toast } from 'react-hot-toast'
 
 export default function DocumentUpload() {
   const [documents, setDocuments] = useState([])
@@ -41,7 +42,9 @@ export default function DocumentUpload() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [documentToDelete, setDocumentToDelete] = useState(null)
   const [selectedDocument, setSelectedDocument] = useState(null)
-  const { toast } = useToast()
+  const { toast: useToastToast } = useToast()
+  const [processing, setProcessing] = useState(false)
+  const [error, setError] = useState(null)
 
   // Fetch documents on component mount
   useEffect(() => {
@@ -52,29 +55,45 @@ export default function DocumentUpload() {
     setIsLoading(true)
     try {
       const docs = await documentApi.getAllDocuments()
-      setDocuments(docs)
+      console.log("Documents fetched:", docs)
+      
+      if (Array.isArray(docs)) {
+        setDocuments(docs)
+      } else {
+        console.warn("API returned unexpected format for documents", docs)
+        setDocuments([])
+      }
     } catch (error) {
       console.error("Error fetching documents:", error)
-      toast({
-        title: "Error",
-        description: "Failed to load documents",
-        variant: "destructive",
-      })
+      toast.error("Failed to load documents. Please try again later.")
+      setError("Failed to fetch documents. Please try again later.")
+      setDocuments([]) // Set empty array on error to prevent undefined errors
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
-      setSelectedFile(e.target.files[0])
+  const handleFileChange = (event) => {
+    const file = event.target.files[0]
+    if (file) {
+      if (file.type !== 'application/pdf') {
+        toast.error('Please upload a PDF file')
+        return
+      }
+      setSelectedFile(file)
+      setError(null)
     }
   }
 
   const handleUpload = async () => {
-    if (!selectedFile) return
+    if (!selectedFile) {
+      toast.error('Please select a file to upload')
+      return
+    }
 
     setIsUploading(true)
+    setProcessing(true)
+    setError(null)
     setUploadProgress(0)
 
     // Simulate upload progress
@@ -84,31 +103,28 @@ export default function DocumentUpload() {
 
     try {
       // Upload file using the API
-      const result = await documentApi.uploadDocument(selectedFile, true)
+      const result = await documentApi.uploadDocument(selectedFile)
 
       setUploadProgress(100)
 
-      if (result.status === "success" && result.document) {
+      if (result && result.id) {
         // Add new document to list
         await fetchDocuments() // Refresh document list
-        setSelectedDocument(result.document)
+        setSelectedDocument(result)
 
-        toast({
-          title: "Upload Successful",
-          description: `${selectedFile.name} has been uploaded and processed.`,
-        })
+        toast.success('Document uploaded successfully!')
+        setSelectedFile(null) // Clear file only on success
+      } else {
+        throw new Error("Upload failed: No document_id returned")
       }
     } catch (error) {
       console.error("Error uploading document:", error)
-      toast({
-        title: "Upload Failed",
-        description: "There was an error uploading your document.",
-        variant: "destructive",
-      })
+      setError(error.message || "Failed to upload document. Please try again.")
+      toast.error(error.message || "Failed to upload document")
     } finally {
       clearInterval(progressInterval)
       setIsUploading(false)
-      setSelectedFile(null)
+      setProcessing(false)
       setUploadProgress(0)
     }
   }
@@ -221,7 +237,7 @@ export default function DocumentUpload() {
                 accept=".pdf,.docx,.txt"
                 onChange={handleFileChange}
               />
-              {selectedFile && !isUploading && (
+              {selectedFile && !isUploading && !processing && (
                 <Button onClick={handleUpload} className="w-full">
                   Upload File
                 </Button>
@@ -235,6 +251,20 @@ export default function DocumentUpload() {
                   <span>{uploadProgress}%</span>
                 </div>
                 <Progress value={uploadProgress} className="progress-animation" />
+              </div>
+            )}
+
+            {processing && (
+              <div className="mt-4">
+                <div className="flex justify-between text-sm mb-1">
+                  <span>Processing...</span>
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-md">
+                {error}
               </div>
             )}
           </CardContent>

@@ -38,23 +38,48 @@ export default function ChatPage() {
     if (!selectedDocument) return
     
     try {
-      const history = await chatApi.getChatHistory(selectedDocument.id)
-      if (history.length === 0) {
+      console.log(`Loading chat history for document: ${selectedDocument.id}`);
+      const history = await chatApi.getChatHistory(selectedDocument.id);
+      console.log("Chat history loaded:", history);
+      
+      if (history && history.length === 0) {
         // Add initial greeting
         setMessages([{
           role: "assistant",
           content: `Hello! I'm your study assistant. Ask me anything about "${selectedDocument.filename}".`
-        }])
-      } else {
-        setMessages(history)
+        }]);
+      } else if (history) {
+        // Convert the history format to match our UI format
+        const formattedHistory = history.map(item => ({
+          role: "user",
+          content: item.question
+        })).concat(history.map(item => ({
+          role: "assistant",
+          content: item.answer
+        })));
+        
+        // Interleave user and assistant messages
+        const interleavedHistory = [];
+        for (let i = 0; i < history.length; i++) {
+          interleavedHistory.push(formattedHistory[i]);
+          interleavedHistory.push(formattedHistory[i + history.length]);
+        }
+        
+        setMessages(interleavedHistory);
       }
     } catch (error) {
-      console.error("Error loading chat history:", error)
+      console.error("Error loading chat history:", error);
       toast({
         title: "Error",
-        description: "Failed to load chat history",
+        description: "Failed to load chat history. Starting a new conversation.",
         variant: "destructive",
-      })
+      });
+      
+      // Start with a greeting
+      setMessages([{
+        role: "assistant",
+        content: `Hello! I'm your study assistant. Ask me anything about "${selectedDocument.filename}".`
+      }]);
     }
   }
   
@@ -74,26 +99,34 @@ export default function ChatPage() {
     setIsLoading(true)
     
     try {
+      console.log(`Sending question: "${input}" about document: ${selectedDocument.id}`);
+      
       // Send to API
       const response = await chatApi.askQuestion(
         input,
-        selectedDocument.id,
-        messages
+        selectedDocument.id
       )
       
+      console.log("Chat response received:", response);
+      
       // Add assistant response
-      setMessages(prev => [...prev, response.message])
+      if (response && response.answer) {
+        setMessages(prev => [...prev, { role: "assistant", content: response.answer }])
+      } else {
+        throw new Error("Invalid response format from server");
+      }
     } catch (error) {
       console.error("Error sending message:", error)
+      
       // Add error message
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: "Sorry, I encountered an error processing your request."
+        content: "Sorry, I encountered an error processing your request. Please try again."
       }])
       
       toast({
         title: "Error",
-        description: "Failed to get response from the server",
+        description: error.message || "Failed to get response from the server",
         variant: "destructive",
       })
     } finally {

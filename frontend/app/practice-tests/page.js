@@ -7,7 +7,8 @@ import {
   Check, 
   X, 
   ClipboardList, 
-  Timer 
+  Timer,
+  Loader2
 } from 'lucide-react'
 
 import {
@@ -33,39 +34,19 @@ import {
   RadioGroupItem,
 } from "@/components/ui/radio-group"
 import { SectionContainer } from "@/components/ui/section-container"
+import { useToast } from "@/components/ui/use-toast"
+import { documentApi, testsApi } from "@/lib/api"
+import { DocumentSelector } from "@/components/DocumentSelector"
 
 export default function PracticeTestPage() {
   const [topic, setTopic] = useState("")
   const [difficulty, setDifficulty] = useState("Medium")
   const [isGenerating, setIsGenerating] = useState(false)
-  const [tests, setTests] = useState([
-    {
-      id: "1",
-      title: "Biology Basics",
-      difficulty: "Medium",
-      questions: [
-        {
-          id: "q1",
-          text: "Which organelle is known as the 'powerhouse of the cell'?",
-          options: ["Nucleus", "Mitochondria", "Golgi Apparatus", "Endoplasmic Reticulum"],
-          type: "multiple-choice",
-          correctAnswer: 1,
-        },
-        {
-          id: "q2",
-          text: "Explain the process of photosynthesis in your own words.",
-          type: "essay",
-        },
-        {
-          id: "q3",
-          text: "What is the main function of DNA?",
-          type: "short-answer",
-          correctAnswer: "Store genetic information",
-        },
-      ],
-      timeLimit: 15,
-    },
-  ])
+  const [isLoading, setIsLoading] = useState(false)
+  const [tests, setTests] = useState([])
+  const [documents, setDocuments] = useState([])
+  const [selectedDocument, setSelectedDocument] = useState("")
+  const [useDocument, setUseDocument] = useState(false)
   const [activeTest, setActiveTest] = useState(null)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState({})
@@ -73,6 +54,13 @@ export default function PracticeTestPage() {
   const [testCompleted, setTestCompleted] = useState(false)
   const [timeRemaining, setTimeRemaining] = useState(0)
   const [score, setScore] = useState(null)
+  const { toast } = useToast()
+
+  // Fetch available documents and tests on mount
+  useEffect(() => {
+    fetchDocuments()
+    fetchTests()
+  }, [])
 
   // Timer effect for test
   useEffect(() => {
@@ -95,57 +83,145 @@ export default function PracticeTestPage() {
     };
   }, [testStarted, timeRemaining]);
 
-  const handleGenerateTest = () => {
-    if (!topic.trim()) return
-
-    setIsGenerating(true)
-
-    // Simulate test generation
-    setTimeout(() => {
-      const newTest = {
-        id: Date.now().toString(),
-        title: topic,
-        difficulty,
-        questions: [
-          {
-            id: `q1-${Date.now()}`,
-            text: `What is the main concept of ${topic}?`,
-            options: ["Option A", "Option B", "Option C", "Option D"],
-            type: "multiple-choice",
-            correctAnswer: 2,
-          },
-          {
-            id: `q2-${Date.now()}`,
-            text: `Explain the importance of ${topic} in your own words.`,
-            type: "essay",
-          },
-          {
-            id: `q3-${Date.now()}`,
-            text: `Define ${topic} briefly.`,
-            type: "short-answer",
-            correctAnswer: `${topic} is a concept that...`,
-          },
-        ],
-        timeLimit: difficulty === "Easy" ? 10 : difficulty === "Medium" ? 15 : 20,
-      }
-
-      setTests((prev) => [newTest, ...prev])
-      setTopic("")
-      setIsGenerating(false)
-    }, 2000)
+  // Fetch documents from API
+  const fetchDocuments = async () => {
+    try {
+      setIsLoading(true)
+      const docs = await documentApi.getAllDocuments()
+      setDocuments(docs)
+    } catch (error) {
+      console.error("Error fetching documents:", error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fetch documents",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleStartTest = (testId) => {
-    setActiveTest(testId)
-    setCurrentQuestionIndex(0)
-    setAnswers({})
-    setTestStarted(true)
-    setTestCompleted(false)
-    setScore(null)
+  // Fetch tests from API
+  const fetchTests = async () => {
+    try {
+      setIsLoading(true)
+      const fetchedTests = await testsApi.getAllTests()
+      setTests(fetchedTests || [])
+    } catch (error) {
+      console.error("Error fetching tests:", error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fetch tests",
+        variant: "destructive",
+      })
+      setTests([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
-    const test = tests.find((t) => t.id === testId)
-    if (test && test.timeLimit) {
-      setTimeRemaining(test.timeLimit * 60)
+  const handleGenerateTest = async () => {
+    if (!topic.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a topic for your test",
+        variant: "destructive",
+      })
+      return
+    }
+
+    // Only validate document selection if useDocument is true
+    if (useDocument && !selectedDocument) {
+      toast({
+        title: "Error",
+        description: "Please select a document",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsGenerating(true)
+    
+    try {
+      console.log("Generating test with parameters:", {
+        topic,
+        documentId: useDocument ? selectedDocument : null,
+        difficulty
+      });
+      
+      // Call the API to generate a test
+      const newTest = await testsApi.generateTest(
+        topic, 
+        useDocument ? selectedDocument : null, 
+        difficulty
+      );
+      
+      console.log("Test successfully generated:", newTest);
+      
+      // Add test to local state
+      if (newTest && newTest.id) {
+        setTests(prevTests => {
+          // Check if this test is already in the array
+          const exists = prevTests.some(t => t.id === newTest.id);
+          if (!exists) {
+            return [newTest, ...prevTests];
+          }
+          return prevTests;
+        });
+      }
+      
+      toast({
+        title: "Success",
+        description: "Practice test generated successfully"
+      });
+      
+      setTopic("");
+    } catch (error) {
+      console.error("Error generating test:", error);
+      
+      // Provide a more specific error message
+      let errorMessage = "Failed to generate test";
+      if (error.message) {
+        // Clean up any JSON or object notation from error message
+        errorMessage = error.message.replace(/\[object Object\]/g, "Error").trim();
+        // If message is empty after cleaning, use default
+        if (!errorMessage) errorMessage = "Failed to generate test";
+      }
+      
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  const handleStartTest = async (testId) => {
+    try {
+      setIsLoading(true)
+      const testData = await testsApi.getTest(testId)
+      
+      setActiveTest(testId)
+      setCurrentQuestionIndex(0)
+      setAnswers({})
+      setTestStarted(true)
+      setTestCompleted(false)
+      setScore(null)
+
+      if (testData && testData.timeLimit) {
+        setTimeRemaining(testData.timeLimit * 60)
+      }
+    } catch (error) {
+      console.error("Error starting test:", error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to load test",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -174,13 +250,58 @@ export default function PracticeTestPage() {
     }
   }
 
-  const handleCompleteTest = () => {
+  const handleCompleteTest = async () => {
+    setIsLoading(true)
     setTestStarted(false)
-    setTestCompleted(true)
-
-    // Calculate score
+    
+    try {
+      const test = tests.find((t) => t.id === activeTest)
+      if (!test) throw new Error("Test not found")
+      
+      // Format answers for backend submission
+      const formattedAnswers = {}
+      
+      Object.keys(answers).forEach(questionId => {
+        const question = test.questions.find(q => q.id === questionId)
+        if (!question) return
+        
+        if (question.type === "multiple-choice") {
+          const selectedIndex = answers[questionId]
+          formattedAnswers[questionId] = question.options[selectedIndex] || ""
+        } else {
+          formattedAnswers[questionId] = answers[questionId] || ""
+        }
+      })
+      
+      console.log("Submitting answers:", formattedAnswers)
+      
+      // Submit test answers to backend
+      const result = await testsApi.submitTestAnswers(activeTest, formattedAnswers)
+      
+      setTestCompleted(true)
+      setScore(result.score || calculateScore())
+      
+      toast({
+        title: "Test completed",
+        description: "Your answers have been submitted",
+      })
+    } catch (error) {
+      console.error("Error submitting test:", error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit test answers",
+        variant: "destructive",
+      })
+      setTestCompleted(true)
+      setScore(calculateScore())
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
+  const calculateScore = () => {
     const test = tests.find((t) => t.id === activeTest)
-    if (!test) return
+    if (!test) return 0
 
     let correctCount = 0
     let totalGradable = 0
@@ -190,7 +311,8 @@ export default function PracticeTestPage() {
         totalGradable++
 
         if (
-          (question.type === "multiple-choice" && answers[question.id] === question.correctAnswer) ||
+          (question.type === "multiple-choice" &&
+            answers[question.id] === question.correctAnswer) ||
           (question.type === "short-answer" &&
             answers[question.id]?.toLowerCase().includes(question.correctAnswer.toString().toLowerCase()))
         ) {
@@ -199,8 +321,25 @@ export default function PracticeTestPage() {
       }
     })
 
-    const calculatedScore = totalGradable > 0 ? (correctCount / totalGradable) * 100 : 0
-    setScore(calculatedScore)
+    return totalGradable > 0 ? (correctCount / totalGradable) * 100 : 0
+  }
+
+  const handleDeleteTest = async (testId) => {
+    try {
+      await testsApi.deleteTest(testId)
+      setTests(prevTests => prevTests.filter(t => t.id !== testId))
+      toast({
+        title: "Test deleted",
+        description: "The test has been removed",
+      })
+    } catch (error) {
+      console.error("Error deleting test:", error)
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete the test",
+        variant: "destructive",
+      })
+    }
   }
 
   const formatTime = (seconds) => {
@@ -214,6 +353,18 @@ export default function PracticeTestPage() {
     if (!test) return null
 
     const question = test.questions[currentQuestionIndex]
+    
+    // Debug the question structure
+    console.log("Current question:", question);
+    console.log("Question type:", question.type);
+    console.log("Has options:", !!question.options);
+    console.log("Options array:", question.options);
+    
+    // Check for alternatives
+    if (question.choices && !question.options) {
+      console.log("Found 'choices' instead of 'options':", question.choices);
+      question.options = question.choices; // Fix on the fly
+    }
 
     return (
       <div>
@@ -235,7 +386,7 @@ export default function PracticeTestPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">{question.text}</CardTitle>
+            <CardTitle className="text-lg">{question.text || question.question}</CardTitle>
           </CardHeader>
           <CardContent>
             {question.type === "multiple-choice" && question.options && (
@@ -352,9 +503,9 @@ export default function PracticeTestPage() {
             <h3 className="text-lg font-semibold mb-2">Answer Key</h3>
             <div className="space-y-4">
               {test.questions.map((question, index) => (
-                <div key={question.id} className="border-b pb-4 last:border-b-0">
+                <div key={`question-${question.id || index}`} className="border-b pb-4 last:border-b-0">
                   <p className="font-medium">
-                    Question {index + 1}: {question.text}
+                    Question {index + 1}: {question.text || question.question}
                   </p>
 
                   {question.type === "multiple-choice" && question.options && (
@@ -432,6 +583,29 @@ export default function PracticeTestPage() {
                       />
                     </div>
 
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="use-document"
+                        checked={useDocument}
+                        onChange={() => setUseDocument(!useDocument)}
+                        className="rounded border-gray-300"
+                      />
+                      <Label htmlFor="use-document">Use document for context (optional)</Label>
+                    </div>
+
+                    {useDocument && (
+                      <div className="space-y-2">
+                        <Label htmlFor="document-selector">Select Document</Label>
+                        <DocumentSelector
+                          documents={documents}
+                          selectedDocument={selectedDocument}
+                          onSelectDocument={setSelectedDocument}
+                          isLoading={isLoading}
+                        />
+                      </div>
+                    )}
+
                     <div>
                       <Label htmlFor="test-difficulty">Difficulty</Label>
                       <Select
@@ -449,10 +623,14 @@ export default function PracticeTestPage() {
                       </Select>
                     </div>
 
-                    <Button onClick={handleGenerateTest} disabled={!topic.trim() || isGenerating} className="w-full">
+                    <Button 
+                      onClick={handleGenerateTest} 
+                      disabled={!topic.trim() || (useDocument && !selectedDocument) || isGenerating} 
+                      className="w-full"
+                    >
                       {isGenerating ? (
                         <>
-                          <motion.div className="mr-2 h-4 w-4 rounded-full border-2 border-t-transparent border-primary-foreground animate-spin" />
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Generating Test...
                         </>
                       ) : (
@@ -464,7 +642,11 @@ export default function PracticeTestPage() {
               </Card>
             </motion.div>
 
-            {tests.length > 0 && (
+            {isLoading && !tests.length ? (
+              <div className="flex justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : tests.length > 0 ? (
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
                 <h3 className="text-lg font-semibold mb-4">Your Practice Tests</h3>
 
@@ -480,7 +662,7 @@ export default function PracticeTestPage() {
                         <CardContent className="pt-6">
                           <div className="flex items-center justify-between">
                             <div>
-                              <h3 className="font-semibold text-lg">{test.title}</h3>
+                              <h3 className="font-semibold text-lg">{test.title || test.topic}</h3>
                               <div className="flex items-center mt-1">
                                 <span
                                   className={`inline-flex items-center px-2 py-1 rounded-full text-xs ${
@@ -494,7 +676,7 @@ export default function PracticeTestPage() {
                                   {test.difficulty}
                                 </span>
                                 <span className="ml-3 text-sm text-muted-foreground">
-                                  {test.questions.length} questions
+                                  {test.questions?.length || 0} questions
                                 </span>
                                 {test.timeLimit && (
                                   <span className="ml-3 text-sm text-muted-foreground flex items-center">
@@ -504,8 +686,10 @@ export default function PracticeTestPage() {
                                 )}
                               </div>
                             </div>
-
-                            <Button onClick={() => handleStartTest(test.id)}>Take Test</Button>
+                            <div className="flex space-x-2">
+                              <Button onClick={() => handleStartTest(test.id)}>Take Test</Button>
+                              <Button variant="outline" onClick={() => handleDeleteTest(test.id)}>Delete</Button>
+                            </div>
                           </div>
                         </CardContent>
                       </Card>
@@ -513,6 +697,14 @@ export default function PracticeTestPage() {
                   ))}
                 </div>
               </motion.div>
+            ) : (
+              <div className="text-center py-12 border rounded-lg">
+                <ClipboardList className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-medium">No Tests Found</h3>
+                <p className="text-muted-foreground mb-4">
+                  Generate your first practice test to get started
+                </p>
+              </div>
             )}
           </>
         ) : (

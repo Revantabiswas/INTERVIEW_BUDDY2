@@ -28,19 +28,15 @@ async def generate_notes(request: NotesRequest):
         context = get_document_context(request.topic, request.document_id)
         
         # Create note taker agent
+        from agents import create_note_taker_agent, create_notes_generation_task, run_agent_task
         note_taker = create_note_taker_agent()
         
-        # Define task for creating notes
-        from crewai import Task
-        notes_task = Task(
-            description=f"Create comprehensive study notes on {request.topic} based on the following context: {context}",
-            expected_output="Well-structured study notes with headings, bullet points, and clear explanations",
-            agent=note_taker,
-            context=context,
-        )
+        # Use the existing notes generation task function instead of creating a Task directly
+        # This ensures proper handling of the context parameter
+        task = create_notes_generation_task(note_taker, request.topic, context)
         
-        # Execute task
-        notes_content = notes_task.execute()
+        # Execute the task using the helper function
+        notes_content = run_agent_task(note_taker, task)
         
         # Generate a unique ID for the notes
         note_id = str(uuid.uuid4())[:8]

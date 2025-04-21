@@ -1,96 +1,226 @@
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List, Dict, Any, Optional
-import uuid
+from fastapi import APIRouter, HTTPException, Depends
+from typing import List, Optional
+from pydantic import BaseModel
 import json
 import os
-from datetime import datetime
+from pathlib import Path
+import logging
+import re
 
-from models.schemas import ChatMessage, ChatRequest, ChatResponse
-from utils import get_document_context, get_document_by_id
-from agents import create_study_tutor_agent, create_explanation_task
+# Imports for LLM functionality
+from agents import get_llm, create_study_tutor_agent, create_explanation_task, run_agent_task
+
+# Change relative imports to absolute imports
+from utils import (
+    get_document_context, DocumentNotFoundError, DocumentProcessingError,
+    get_chapter_specific_context, debug_document_retrieval
+)
+from config import UPLOAD_DIR, VECTOR_STORE_DIR
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
-# Store chat histories in a persistent file
-CHAT_HISTORY_FILE = "./storage/chat_histories.json"
+class Message(BaseModel):
+    role: str
+    content: str
 
-# Load existing chat histories or create empty dict
-def get_chat_histories():
-    if os.path.exists(CHAT_HISTORY_FILE):
-        with open(CHAT_HISTORY_FILE, 'r') as f:
-            try:
-                return json.load(f)
-            except json.JSONDecodeError:
-                return {}
-    return {}
+class ChatRequest(BaseModel):
+    messages: List[Message]
+    document_ids: Optional[List[str]] = None
 
-def save_chat_histories(histories):
-    os.makedirs(os.path.dirname(CHAT_HISTORY_FILE), exist_ok=True)
-    with open(CHAT_HISTORY_FILE, 'w') as f:
-        json.dump(histories, f)
+class ChatResponse(BaseModel):
+    content: str
+    sources: Optional[List[str]] = None
 
-@router.post("/ask", response_model=ChatResponse)
-async def ask_question(request: ChatRequest):
-    """Ask a question about a document"""
-    # Validate document exists
-    document = get_document_by_id(request.document_id)
-    if not document:
-        raise HTTPException(status_code=404, detail="Document not found")
-    
-    # Get chat histories
-    chat_histories = get_chat_histories()
-    
-    # Create chat ID based on document ID if not exists
-    if request.document_id not in chat_histories:
-        chat_histories[request.document_id] = []
-    
-    # Add user message to history
-    user_message = {"role": "user", "content": request.question}
-    chat_histories[request.document_id].append(user_message)
-    
+@router.post("/ask")
+async def ask_question(request: dict):
+    """
+    Ask a question about a specific document.
+    """
     try:
-        # Get document context
-        context = get_document_context(request.question, request.document_id)
-        
-        # Create agent and task
-        tutor = create_study_tutor_agent()
-        explanation_task = create_explanation_task(tutor, request.question, context)
-        
-        # Run the task
-        result = explanation_task.execute()
-        
-        # Create assistant message
-        assistant_message = {"role": "assistant", "content": result}
-        
-        # Add to history
-        chat_histories[request.document_id].append(assistant_message)
-        
-        # Save updated chat histories
-        save_chat_histories(chat_histories)
-        
-        # Return response with sources
-        response = ChatResponse(
-            message=ChatMessage(**assistant_message),
-            sources=[document["filename"]]
-        )
-        
-        return response
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error processing question: {str(e)}")
+        document_id = request.get("document_id")
+        question = request.get("question")
 
-@router.get("/history/{document_id}", response_model=List[ChatMessage])
+        if not document_id or not question:
+            raise HTTPException(status_code=400, detail="Missing document_id or question")
+
+        # Get document context
+        try:
+            # Check if this is a chapter-specific question
+            chapter_match = re.search(r"chapter\s+(\d+)", question.lower())
+            
+            if chapter_match:
+                # For chapter-specific questions, use specialized retrieval
+                logger.info(f"Chapter-specific question detected for chapter {chapter_match.group(1)}")
+                chapter_number = int(chapter_match.group(1))
+                context = get_chapter_specific_context(question, document_id, chapter_number)
+                logger.info(f"Retrieved chapter-specific context of length: {len(context)}")
+            else:
+                # Regular question handling
+                context = get_document_context(question, document_id)
+                
+            sources = [document_id]
+            
+        except DocumentNotFoundError:
+            raise HTTPException(status_code=404, detail=f"Document {document_id} not found")
+        except DocumentProcessingError as e:
+            raise HTTPException(status_code=500, detail=str(e))
+
+        # Create an AI tutor and task for document-specific questions
+        tutor_agent = create_study_tutor_agent()
+        
+        # For very short contexts that might be index entries, try to detect this case
+        if len(context) < 200 or "index entries" in context.lower():
+            logger.warning(f"Very short context retrieved, possibly index-only: {context}")
+            # If the context is very short or contains the index warning, try to recover
+            try:
+                # Try debug retrieval to get more insights
+                debug_info = debug_document_retrieval(document_id, question)
+                logger.info(f"Debug retrieval results: {debug_info}")
+                
+                # Check if all retrieved chunks appear to be index entries
+                if all(chunk.get("appears_to_be_index", False) for chunk in debug_info.get("chunks_analysis", [])):
+                    # This is a case where we're only getting index entries
+                    error_message = (
+                        "I can't provide a detailed explanation because the document sections I can access "
+                        "appear to be primarily index or table of contents pages rather than actual content. "
+                        "Could you try asking about a different topic from the document, or provide more specific "
+                        "details about what you'd like to know? For example, instead of asking about 'Chapter 1', "
+                        "you might ask about a specific concept that appears in that chapter."
+                    )
+                    return {
+                        "content": error_message,
+                        "sources": sources
+                    }
+            except Exception as debug_error:
+                logger.error(f"Error in debug recovery: {debug_error}")
+                # Continue with the original context if debug fails
+                pass
+            
+        explanation_task = create_explanation_task(tutor_agent, question, context)
+        
+        # Generate the answer
+        response = run_agent_task(tutor_agent, explanation_task)
+
+        return {
+            "content": response,
+            "sources": sources
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error processing question: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to process question: {str(e)}")
+
+@router.post("/chat", response_model=ChatResponse)
+async def chat(request: ChatRequest):
+    """
+    Chat endpoint that uses document context if provided. 
+    Answers general questions if no context is attached.
+    """
+    try:
+        # Get the last user message
+        user_messages = [msg for msg in request.messages if msg.role == "user"]
+        if not user_messages:
+            raise HTTPException(status_code=400, detail="No user message found")
+        query = user_messages[-1].content
+
+        # Get context from documents if provided
+        context = ""
+        sources = []
+        if request.document_ids:
+            for doc_id in request.document_ids:
+                try:
+                    # Fix the parameter order: query first, then document_id
+                    doc_context = get_document_context(query, doc_id)
+                    if doc_context:
+                        context += f"\n\nFrom document '{doc_id}':\n{doc_context}"
+                        sources.append(doc_id)
+                except DocumentNotFoundError:
+                    logger.warning(f"Document {doc_id} not found, skipping")
+                except Exception as e:
+                    logger.error(f"Error getting context for document {doc_id}: {str(e)}")
+                    # Continue with other documents instead of failing completely
+
+        # Create a tutor agent for generating responses
+        tutor_agent = create_study_tutor_agent()
+        
+        if context:
+            # Create a task with document context
+            system_prompt = """You are an expert tutor. Answer the user's question based on the provided context.
+            If the answer isn't in the context, say so politely. Cite specific parts of the document when relevant."""
+            task_context = f"{context}\n\nQuestion: {query}"
+            explanation_task = create_explanation_task(tutor_agent, query, task_context)
+        else:
+            # Create a task for general questions without document context
+            explanation_task = create_explanation_task(tutor_agent, query, "")
+        
+        # Generate the response
+        response = run_agent_task(tutor_agent, explanation_task)
+
+        return ChatResponse(
+            content=response,
+            sources=sources if sources else None
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in chat: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/history/{document_id}")
 async def get_chat_history(document_id: str):
-    """Get chat history for a document"""
-    chat_histories = get_chat_histories()
-    if document_id not in chat_histories:
-        return []
-    return [ChatMessage(**msg) for msg in chat_histories[document_id]]
+    """
+    Get chat history for a specific document
+    """
+    try:
+        history_path = Path("./storage/chat_histories.json")
+        
+        # Create file if it doesn't exist
+        if not history_path.exists():
+            with open(history_path, 'w') as f:
+                json.dump({}, f)
+            return []
+        
+        # Read chat history
+        with open(history_path, 'r') as f:
+            all_histories = json.load(f)
+            
+        # Return chat history for the document
+        document_history = all_histories.get(document_id, [])
+        return document_history
+    
+    except Exception as e:
+        logger.error(f"Error getting chat history: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to get chat history: {str(e)}")
 
 @router.delete("/history/{document_id}")
 async def clear_chat_history(document_id: str):
-    """Clear chat history for a document"""
-    chat_histories = get_chat_histories()
-    if document_id in chat_histories:
-        chat_histories[document_id] = []
-        save_chat_histories(chat_histories)
-    return {"status": "success", "message": "Chat history cleared"}
+    """
+    Clear chat history for a specific document
+    """
+    try:
+        history_path = Path("./storage/chat_histories.json")
+        
+        # Return early if file doesn't exist
+        if not history_path.exists():
+            return {"message": "History cleared"}
+        
+        # Read chat history
+        with open(history_path, 'r') as f:
+            all_histories = json.load(f)
+            
+        # Clear history for document
+        all_histories[document_id] = []
+        
+        # Write back
+        with open(history_path, 'w') as f:
+            json.dump(all_histories, f)
+            
+        return {"message": "History cleared"}
+    
+    except Exception as e:
+        logger.error(f"Error clearing chat history: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to clear chat history: {str(e)}")

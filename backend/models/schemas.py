@@ -101,7 +101,7 @@ class Roadmap(BaseModel):
 
 class TestRequest(BaseModel):
     topic: str
-    document_id: str
+    document_id: Optional[str] = None
     difficulty: str = "Medium"
 
 class TestQuestion(BaseModel):
@@ -134,3 +134,24 @@ class DSAQuestion(BaseModel):
     companies: List[str]
     link: Optional[str] = None
     platform: Optional[str] = None
+
+class MindMapResponse(BaseModel):
+    nodes: List[MindMapNode]
+    edges: List[MindMapEdge]
+    description: str
+
+class FlashcardResponse(BaseModel):
+    cards: List[Flashcard]
+
+class TestResponse(BaseModel):
+    questions: List[TestQuestion]
+    answer_key: Dict[str, str]
+
+class RoadmapResponse(BaseModel):
+    overview: str
+    schedule: List[RoadmapDay]
+    milestones: List[str]
+    sections: List[str]
+
+class ErrorResponse(BaseModel):
+    detail: str

@@ -20,6 +20,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Search, ExternalLink, CheckCircle, Clock, BarChart, Code, AlertTriangle, CheckSquare, X, HelpCircle, Play, PauseCircle, Share2, MessageSquare } from "lucide-react"
+import { dsaApi } from "@/lib/api"  // Import the DSA API
 
 // Mock data for DSA questions by category
 const dsaQuestionsByCategory = {
@@ -383,24 +384,43 @@ export default function DSAPractice() {
     setShowRoleDialog(false)
   }
 
-  const handleDebugCode = () => {
-    setIsDebugging(true)
-
-    // Simulate LLM processing
-    setTimeout(() => {
+  const handleDebugCode = async () => {
+    setIsDebugging(true);
+    
+    try {
+      // Use the actual backend API for code analysis
+      const response = await dsaApi.analyzeCode(
+        codeToDebug || sampleBuggyCode,  // Use provided code or the sample code
+        "Maximum Subarray Problem",  // Problem description
+        "javascript"  // Language
+      );
+      
+      // Transform the API response to match our UI's expected format
       setDebugResult({
-        issues: [
-          "The algorithm fails for arrays with all negative numbers because it initializes maxSoFar to 0",
-          "When all elements are negative, the function will return 0 instead of the largest (least negative) sum",
-          "The algorithm resets maxEndingHere to 0 when it becomes negative, which is incorrect for all-negative arrays",
-        ],
-        solution: sampleFixedCode,
-        explanation:
-          "The Kadane's algorithm implementation has a bug when handling arrays with all negative numbers. The correct implementation should initialize maxSoFar and maxEndingHere to the first element of the array, and then compare each element with the sum of the current element and maxEndingHere.",
-      })
-      setIsDebugging(false)
-    }, 2000)
-  }
+        issues: response.issues || response.bugs || [],
+        solution: response.improved_code || response.solution || sampleFixedCode,
+        explanation: response.explanation || "The algorithm has been optimized to handle all types of inputs correctly."
+      });
+    } catch (error) {
+      console.error("Error debugging code:", error);
+      
+      // Fall back to mock data if the API call fails
+      setTimeout(() => {
+        setDebugResult({
+          issues: [
+            "The algorithm fails for arrays with all negative numbers because it initializes maxSoFar to 0",
+            "When all elements are negative, the function will return 0 instead of the largest (least negative) sum",
+            "The algorithm resets maxEndingHere to 0 when it becomes negative, which is incorrect for all-negative arrays",
+          ],
+          solution: sampleFixedCode,
+          explanation:
+            "The Kadane's algorithm implementation has a bug when handling arrays with all negative numbers. The correct implementation should initialize maxSoFar and maxEndingHere to the first element of the array, and then compare each element with the sum of the current element and maxEndingHere.",
+        });
+      }, 2000);
+    } finally {
+      setIsDebugging(false);
+    }
+  };
 
   // Handle starting a mock interview
   const startMockInterview = () => {

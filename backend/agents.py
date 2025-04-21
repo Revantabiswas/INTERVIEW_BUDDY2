@@ -2,6 +2,7 @@ import os
 from langchain_groq import ChatGroq
 from functools import lru_cache
 from crewai import Agent, Task, Crew, Process
+import re
 
 # Replace Streamlit caching with Python's lru_cache
 @lru_cache(maxsize=1)
@@ -12,22 +13,75 @@ def get_llm():
     # Configure the Groq LLM
     llm = ChatGroq(
         groq_api_key=groq_api_key,
-        model_name="groq/llama3-70b-8192",
+        model_name="groq/qwen-qwq-32b",
     )
     return llm
 
 # Create a function for explanation tasks
 def create_explanation_task(agent, question, context):
+    """Create a task for explaining concepts using clear, concise language"""
+    # Detect if this is a chapter-specific question
+    chapter_match = re.search(r"chapter\s+(\d+)", question.lower())
+    
+    # Base task description
+    task_description = f"""Explain the following concept using clear, concise language. 
+    Break down complex ideas into manageable parts. Use analogies where helpful.
+    
+    Question: {question}
+    
+    Context information:
+    {context}
+    
+    Guidelines:
+    1. Start with a direct, clear answer to the question - get straight to the point
+    2. Provide relevant examples from the context
+    3. Break down complex concepts into simpler parts
+    4. Use analogies or comparisons when helpful
+    5. Reference specific information from the document when relevant
+    6. If the question is unclear or lacks context, ask for clarification
+    7. If the context appears to be an index, table of contents, or references section rather than actual content, 
+       explain that you need more specific questions about concepts, not just terms from the index
+    8. Always provide substantive educational value in your answers, not just listings or metadata
+    9. Never respond with raw index entries, reference lists, or page numbers
+    10. Focus on explaining the concept rather than reporting document metadata
+    """
+    
+    # Add chapter-specific instructions if applicable
+    if chapter_match:
+        chapter_num = chapter_match.group(1)
+        task_description += f"""
+        11. This question is about Chapter {chapter_num}. Focus your answer specifically on the content 
+            and concepts from this chapter.
+        12. If you can't find sufficient information about Chapter {chapter_num} in the context,
+            explain what specific content would help you provide a better answer.
+        13. Structure your answer to reflect the organization of Chapter {chapter_num} if possible.
+        """
+    
+    # Additional instructions for when context is thin
+    if not context or len(context) < 200:
+        task_description += """
+        Important: The context information is limited or missing. Please:
+        1. Acknowledge the limited information available
+        2. Provide general information about the topic based on your knowledge
+        3. Explain what specific details from the document would help you give a more complete answer
+        4. Suggest alternative questions that might yield better results
+        """
+    
+    # Check if context appears to be primarily index entries
+    if context and ("index entries" in context.lower() or 
+                  re.search(r"(\w+,\s+\d+[\s,]*)+", context) and len(context) < 500):
+        task_description += """
+        Important: The context appears to be primarily from an index or reference section rather than
+        substantive content. Please:
+        1. Explain that you can see references to the topic but not the actual content
+        2. Suggest more specific questions about concepts rather than just asking about a chapter or topic name
+        3. Provide general information about the topic based on your knowledge
+        4. Don't list the index entries or page numbers as they aren't helpful
+        """
+    
     return Task(
-        description=f"""Explain the following concept using clear, concise language. 
-        Break down complex ideas into manageable parts. Use analogies where helpful.
-        
-        Question: {question}
-        
-        Context information:
-        {context}
-        """,
-        expected_output="A clear explanation of the concept with examples and analogies if appropriate.",
+        description=task_description,
+        expected_output="A clear, well-structured explanation that directly addresses the question while incorporating relevant context",
         agent=agent
     )
 
@@ -36,7 +90,22 @@ def create_study_tutor_agent():
     return Agent(
         role="Study Tutor",
         goal="Explain complex concepts clearly and help students understand course material",
-        backstory="You are an expert educator with years of experience breaking down difficult concepts into understandable explanations. You excel at adapting your teaching style to match different learning preferences.",
+        backstory="""You are an expert educator with years of experience breaking down difficult concepts 
+        into understandable explanations. You excel at adapting your teaching style to match different 
+        learning preferences and maintaining engaging conversations.
+        
+        Your key strengths include:
+        1. Breaking down complex topics into digestible pieces
+        2. Providing clear, concrete examples
+        3. Using analogies to connect new concepts with familiar ones
+        4. Maintaining context across a conversation
+        5. Identifying and addressing gaps in understanding
+        6. Encouraging critical thinking and deeper exploration
+        7. Adapting explanations based on the student's responses
+        8. Referencing source material effectively
+        
+        You aim to not just answer questions, but to ensure deep understanding and 
+        help students build connections between different concepts.""",
         llm=get_llm(),
         verbose=True
     )
@@ -155,6 +224,19 @@ def create_dsa_recommendation_agent():
         verbose=True
     )
 
+def create_dsa_expert_agent():
+    """Create a general DSA expert agent for various DSA-related tasks"""
+    return Agent(
+        role="DSA Expert",
+        goal="Provide comprehensive assistance with data structures and algorithms for interview preparation",
+        backstory="You are an expert in data structures and algorithms with extensive experience in technical interviews. "
+                "You have a deep understanding of problem-solving techniques, algorithm design, and implementation. "
+                "You can generate practice questions, create study plans, and analyze code solutions to help candidates "
+                "prepare effectively for technical interviews.",
+        llm=get_llm(),
+        verbose=True
+    )
+
 def create_coding_pattern_agent():
     """Create an agent that identifies common coding patterns and teaches problem-solving approaches"""
     return Agent(
@@ -227,33 +309,86 @@ def create_test_generation_task(agent, topic, difficulty, context):
         agent=agent
     )
 
-def create_flashcard_generation_task(agent, topic, context):
+def create_flashcard_generation_task(agent, topic, context, num_cards=10):
     return Task(
-        description=f"""Create a set of flashcards for the following topic.
-        Each flashcard should have a clear question/term on one side and a concise answer/definition on the other.
+        description=f"""Create a set of {num_cards} flashcards for the following topic.
+        Each flashcard should have a clear question/term on the front side and a concise answer/definition on the back side.
         Focus on key concepts, definitions, formulas, and important facts.
         
         Topic: {topic}
+        Number of cards to generate: {num_cards}
         
         Context information:
         {context}
+        
+        IMPORTANT FORMATTING INSTRUCTIONS:
+        1. Output the flashcards in JSON format as an array of objects
+        2. Each flashcard object MUST have exactly two fields: "front" and "back"
+        3. The "front" should contain a clear, concise question or term (typically 1-2 sentences)
+        4. The "back" should contain a comprehensive yet concise answer or explanation (typically 1-3 sentences)
+        5. Ensure the front and back are related and form a logical pair
+        6. Do NOT include any markdown formatting, just plain text
+        7. Do NOT include card numbers or labels like "Card 1:" in the content
+        8. Make sure content is appropriate for flashcard display (not too long)
+        9. IMPORTANT: Avoid using percentage signs (%) in your content as they can cause formatting issues
+        10. Always use complete sentences and proper grammar
+        
+        EXAMPLE FORMAT (but create your own content):
+        [
+          {{
+            "front": "What is a binary search tree?",
+            "back": "A binary tree data structure where each node has at most two children, with all left descendants less than the node and all right descendants greater than the node."
+          }},
+          {{
+            "front": "What is time complexity?",
+            "back": "A measure of the amount of time an algorithm takes to run as a function of the length of the input."
+          }}
+        ]
+        
+        Remember to extract the most important concepts from the context that are related to the topic and create high-quality, educational flashcards.
         """,
-        expected_output="A set of flashcards in JSON format with 'front' and 'back' fields for each card.",
+        expected_output="A JSON array of flashcard objects, each with 'front' and 'back' fields in proper format for display.",
         agent=agent
     )
 
 def create_mind_map_task(agent, topic, context):
     return Task(
-        description=f"""Create a detailed description of a mind map for the following topic.
-        Identify the central concept and key branches of related ideas.
-        Show connections and relationships between concepts.
+        description=f"""Create a detailed mind map for the following topic. Follow the specific formatting instructions below.
         
         Topic: {topic}
         
         Context information:
         {context}
+        
+        FORMATTING INSTRUCTIONS:
+        
+        1. Begin with identifying the central concept that best represents the topic
+        
+        2. Identify 4-8 main branches (key concepts/categories) that connect directly to the central concept
+        
+        3. For each main branch, identify 2-5 sub-branches (related concepts, details, or examples)
+        
+        4. Structure your response in a hierarchical format showing:
+          - Central concept (the topic)
+          - Main branches (key concepts)
+          - Sub-branches for each main branch
+        
+        5. IMPORTANT: Use a clear hierarchical format with the following levels:
+          - Central Concept/Topic: The main subject
+          - Branch 1: First key concept
+              - Sub-branch 1.1: Detail or example for Branch 1
+              - Sub-branch 1.2: Another detail or example for Branch 1
+          - Branch 2: Second key concept
+              - Sub-branch 2.1: Detail or example for Branch 2
+          - ...and so on
+        
+        6. Ensure concepts and relationships are clearly labeled and accurate based on the context information.
+        
+        7. Keep branch and sub-branch descriptions concise (preferably under 60 characters) to fit well in the visualization.
+        
+        Remember that this mind map will be visualized as an interactive diagram with nodes and connections, so focus on creating a clear hierarchical structure that shows the relationships between concepts.
         """,
-        expected_output="A detailed description of a mind map with central concept, branches, and connections in a format that can be visualized.",
+        expected_output="A detailed mind map with central concept, branches, and sub-branches in a clear hierarchical format.",
         agent=agent
     )
 
@@ -408,6 +543,79 @@ def create_dsa_recommendation_task(agent, user_profile, target_companies=None, d
         with brief explanations of why each problem is relevant to their goals.
         """,
         expected_output="A list of recommended DSA problems with explanations tailored to the user's needs.",
+        agent=agent
+    )
+
+def create_dsa_question_generation_task(agent, topic=None, difficulty=None, count=5):
+    """Create a task for generating DSA practice questions"""
+    return Task(
+        description=f"""Generate {count} DSA practice questions.
+        
+        Topic: {topic if topic else "Any DSA topic"}
+        Difficulty: {difficulty if difficulty else "Mixed difficulty levels"}
+        
+        For each question, provide:
+        1. A clear problem statement
+        2. Input/output examples
+        3. Constraints
+        4. Difficulty level
+        5. Topics covered
+        6. Companies that commonly ask this type of question
+        7. A brief explanation of the approach (without the full solution)
+        """,
+        expected_output=f"A list of {count} DSA practice questions with complete details.",
+        agent=agent
+    )
+
+def create_dsa_plan_generation_task(agent, days_available, hours_per_day):
+    """Create a task for generating a personalized DSA study plan"""
+    return Task(
+        description=f"""Create a personalized DSA study plan for a candidate with {days_available} days available 
+        and approximately {hours_per_day} hours per day for studying.
+        
+        The plan should include:
+        1. A day-by-day breakdown of topics to study
+        2. Recommended practice problems for each topic
+        3. Milestones and checkpoints to track progress
+        4. Time allocation for different activities (learning, practice, review)
+        5. Tips for effective study and preparation
+        6. Resources and references for each topic
+        """,
+        expected_output="A comprehensive DSA study plan with day-by-day schedule and resources.",
+        agent=agent
+    )
+
+def create_dsa_code_analysis_task(agent, code, language, problem=None):
+    """Create a task for analyzing DSA code solutions"""
+    
+    problem_context = f"Problem: {problem}\n\n" if problem else ""
+    
+    return Task(
+        description=f"""Analyze the following {language} code solution for a DSA problem:
+        
+        {problem_context}Code:
+        {code}
+        
+        Provide a comprehensive analysis including:
+        1. Correctness assessment - identify any bugs or issues in the code
+        2. Time complexity analysis
+        3. Space complexity analysis
+        4. Potential optimizations
+        5. Edge cases that might not be handled
+        6. Best practices and coding style feedback
+        7. Improved version of the code that fixes any identified issues
+        
+        Format your response clearly with these sections:
+        - BUGS: List of identified bugs or issues (as bullet points)
+        - OPTIMIZATIONS: Suggestions for improving the code efficiency
+        - IMPROVED_CODE: A corrected and optimized version of the code
+        - TIME_COMPLEXITY: Analysis of the time complexity
+        - SPACE_COMPLEXITY: Analysis of the space complexity
+        - EXPLANATION: A clear explanation of what was wrong with the original code and how the improved version fixes the issues
+        
+        Ensure your response can be parsed into these distinct sections for use in a debugging tool.
+        """,
+        expected_output="A detailed code analysis with bugs, optimizations, improved code, complexity metrics, and explanation.",
         agent=agent
     )
 

@@ -1,41 +1,136 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Network, Download, Trash2, Search, Filter, Plus, Eye, List } from "lucide-react"
+import { Network, Download, Trash2, Search, Filter, Plus, Eye, List, Loader2, X, ZoomIn, ZoomOut, Move } from "lucide-react"
+import { documentApi, mindMapsApi } from "@/lib/api"
+import { useToast } from "@/components/ui/use-toast"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Label } from "@/components/ui/label"
+import dynamic from "next/dynamic"
 
-// Mock data for mind maps
-const mockMindMaps = [
-  {
-    id: 1,
-    title: "Data Structures Overview",
-    source: "Data Structures Notes.pdf",
-    createdAt: "2023-10-15",
-    nodes: 24,
-    description: "A comprehensive overview of common data structures and their relationships.",
-    preview: "/placeholder.svg?height=200&width=400",
-  },
-  {
-    id: 2,
-    title: "Sorting Algorithms Comparison",
-    source: "Algorithm Cheat Sheet.docx",
-    createdAt: "2023-10-12",
-    nodes: 16,
-    description: "Visual comparison of different sorting algorithms and their properties.",
-    preview: "/placeholder.svg?height=200&width=400",
-  },
-]
+// Dynamically import D3MindMap component with SSR disabled
+const D3MindMap = dynamic(() => import("@/components/D3MindMap"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-[500px] flex items-center justify-center">
+      <Loader2 className="h-8 w-8 animate-spin" />
+    </div>
+  ),
+})
 
 export default function MindMaps() {
-  const [mindMaps, setMindMaps] = useState(mockMindMaps)
+  const [mindMaps, setMindMaps] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
   const [sourceFilter, setSourceFilter] = useState("All")
   const [viewMode, setViewMode] = useState("visual")
+  const [documents, setDocuments] = useState([])
+  const [selectedDocument, setSelectedDocument] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [selectedMap, setSelectedMap] = useState(null)
+  const [isViewingMap, setIsViewingMap] = useState(false)
+  const { toast } = useToast()
+
+  // Fetch available documents and mind maps on mount
+  useEffect(() => {
+    fetchDocuments()
+    fetchMindMaps()
+  }, [])
+
+  const fetchDocuments = async () => {
+    try {
+      setIsLoading(true)
+      const docs = await documentApi.getAllDocuments()
+      setDocuments(docs)
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const fetchMindMaps = async () => {
+    try {
+      setIsLoading(true)
+      const maps = await mindMapsApi.getAllMindMaps()
+      // Format mind maps to match our component's expected structure
+      const formattedMaps = maps.map(map => ({
+        id: map.id,
+        title: map.topic,
+        source: documents.find(d => d.id === map.document_id)?.filename || "Document",
+        createdAt: new Date(map.created_at).toLocaleDateString(),
+        nodes: map.nodes.length,
+        edges: map.edges,
+        description: `Mind map about ${map.topic}`,
+        preview: "/placeholder.svg",
+        rawData: map // Keep the original data
+      }))
+      setMindMaps(formattedMaps)
+    } catch (error) {
+      console.error("Error fetching mind maps:", error)
+      toast({
+        title: "Error",
+        description: "Failed to load mind maps: " + error.message,
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const generateMindMap = async () => {
+    if (!selectedDocument) {
+      toast({
+        title: "Error",
+        description: "Please select a document first",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const topic = searchQuery || "full document content";
+
+    try {
+      setIsGenerating(true);
+      // Note: mindMapsApi.generateMindMap expects (documentId, topic) in that order
+      const response = await mindMapsApi.generateMindMap(selectedDocument, topic);
+      toast({
+        title: "Success",
+        description: "Mind map generated successfully",
+      });
+      // Refresh the mind maps list to include the new one
+      await fetchMindMaps();
+    } catch (error) {
+      console.error("Error generating mind map:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to generate mind map",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const viewMindMap = useCallback((map) => {
+    setSelectedMap(map);
+    setIsViewingMap(true);
+  }, []);
+
+  const closeMindMapView = useCallback(() => {
+    setSelectedMap(null);
+    setIsViewingMap(false);
+  }, []);
 
   // Get unique sources for filter
   const sources = ["All", ...new Set(mindMaps.map((map) => map.source))]
@@ -46,13 +141,29 @@ export default function MindMaps() {
       map.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       map.description.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesSource = sourceFilter === "All" || map.source === sourceFilter
-
     return matchesSearch && matchesSource
   })
 
-  const handleDeleteMap = (id) => {
-    setMindMaps(mindMaps.filter((map) => map.id !== id))
-  }
+  const handleDeleteMap = async (id) => {
+    try {
+      await mindMapsApi.deleteMindMap(id);
+      setMindMaps(mindMaps.filter((map) => map.id !== id));
+      if (selectedMap?.id === id) {
+        setSelectedMap(null);
+      }
+      toast({
+        title: "Success",
+        description: "Mind map deleted successfully",
+      });
+    } catch (error) {
+      console.error("Error deleting mind map:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete mind map: " + error.message,
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 animate-fade-in">
@@ -67,38 +178,87 @@ export default function MindMaps() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Button className="w-full flex items-center">
-                <Plus className="mr-2 h-4 w-4" />
-                New Mind Map
-              </Button>
+              <Label>Select Document</Label>
+              <Select value={selectedDocument} onValueChange={setSelectedDocument}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a document" />
+                </SelectTrigger>
+                <SelectContent>
+                  {documents.map((doc) => (
+                    <SelectItem key={doc.id} value={doc.id}>
+                      {doc.filename}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Topic or search query..."
+                className="pl-10"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            <Button 
+              className="w-full" 
+              onClick={generateMindMap}
+              disabled={isGenerating || !selectedDocument}
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Plus className="mr-2 h-4 w-4" />
+                  Generate Mind Map
+                </>
+              )}
+            </Button>
 
             <div className="pt-4 border-t">
               <h3 className="text-sm font-medium mb-2">Filter Mind Maps</h3>
-              <div className="space-y-3">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search mind maps..."
-                    className="pl-10"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
+              <Select value={sourceFilter} onValueChange={setSourceFilter}>
+                <SelectTrigger>
+                  <Filter className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by source" />
+                </SelectTrigger>
+                <SelectContent>
+                  {sources.map((source) => (
+                    <SelectItem key={source} value={source}>
+                      {source}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-                <Select value={sourceFilter} onValueChange={setSourceFilter}>
-                  <SelectTrigger>
-                    <Filter className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Filter by source" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sources.map((source) => (
-                      <SelectItem key={source} value={source}>
-                        {source}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <div className="pt-4 border-t">
+              <h3 className="text-sm font-medium mb-2">View Mode</h3>
+              <div className="flex gap-2">
+                <Button
+                  variant={viewMode === "visual" ? "default" : "outline"}
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setViewMode("visual")}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Visual
+                </Button>
+                <Button
+                  variant={viewMode === "list" ? "default" : "outline"}
+                  size="sm"
+                  className="w-full"
+                  onClick={() => setViewMode("list")}
+                >
+                  <List className="h-4 w-4 mr-2" />
+                  List
+                </Button>
               </div>
             </div>
           </CardContent>
@@ -177,7 +337,7 @@ export default function MindMaps() {
                           <div className="flex justify-between items-center w-full">
                             <Badge variant="outline">{map.nodes} nodes</Badge>
                             <div className="flex space-x-2">
-                              <Button variant="outline" size="sm">
+                              <Button variant="outline" size="sm" onClick={() => viewMindMap(map)}>
                                 <Eye className="h-4 w-4 mr-2" />
                                 View
                               </Button>
@@ -231,7 +391,7 @@ export default function MindMaps() {
                             </p>
                           </div>
                           <div className="flex space-x-2">
-                            <Button variant="ghost" size="sm">
+                            <Button variant="ghost" size="sm" onClick={() => viewMindMap(map)}>
                               <Eye className="h-4 w-4" />
                             </Button>
                             <Button variant="ghost" size="sm">
@@ -321,7 +481,7 @@ export default function MindMaps() {
                             <div className="flex justify-between items-center w-full">
                               <Badge variant="outline">{map.nodes} nodes</Badge>
                               <div className="flex space-x-2">
-                                <Button variant="outline" size="sm">
+                                <Button variant="outline" size="sm" onClick={() => viewMindMap(map)}>
                                   <Eye className="h-4 w-4 mr-2" />
                                   View
                                 </Button>
@@ -362,7 +522,7 @@ export default function MindMaps() {
                               </p>
                             </div>
                             <div className="flex space-x-2">
-                              <Button variant="ghost" size="sm">
+                              <Button variant="ghost" size="sm" onClick={() => viewMindMap(map)}>
                                 <Eye className="h-4 w-4" />
                               </Button>
                               <Button variant="ghost" size="sm">
@@ -403,6 +563,28 @@ export default function MindMaps() {
           </Tabs>
         </div>
       </div>
+
+      {/* Mind Map Viewer */}
+      {isViewingMap && selectedMap && (
+        <Dialog open={isViewingMap} onOpenChange={closeMindMapView}>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>{selectedMap.title}</DialogTitle>
+              <DialogDescription>{selectedMap.description}</DialogDescription>
+            </DialogHeader>
+            <div className="w-full h-[500px]">
+              <D3MindMap
+                nodes={selectedMap.rawData.nodes}
+                edges={selectedMap.rawData.edges}
+              />
+            </div>
+            <Button variant="outline" className="mt-4" onClick={closeMindMapView}>
+              <X className="h-4 w-4 mr-2" />
+              Close
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   )
 }
