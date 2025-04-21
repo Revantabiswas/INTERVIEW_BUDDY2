@@ -62,7 +62,7 @@ Interview Buddy AI is a full-stack application designed to help job seekers prep
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone (https://github.com/Revantabiswas/Inteview_Buddy)
    cd Interview
    ```
 
