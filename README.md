@@ -1,6 +1,6 @@
 # Interview Buddy AI
 
-![Interview Buddy AI](frontend/public/placeholder-logo.svg)
+![Interview Buddy AI](frontend/public/logo.jpeg)
 
 A comprehensive AI-powered interview preparation platform designed to help users practice and excel in technical interviews through personalized study paths, mock interviews, and real-time feedback.
 
