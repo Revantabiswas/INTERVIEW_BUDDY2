@@ -1,6 +1,6 @@
 # Interview Buddy AI
 
-![Interview Buddy AI](frontend/public/logo.jpg)
+![Interview Buddy AI](frontend/public/logo.jpeg)
 
 A comprehensive AI-powered interview preparation platform designed to help users practice and excel in technical interviews through personalized study paths, mock interviews, and real-time feedback.
 
@@ -62,7 +62,7 @@ Interview Buddy AI is a full-stack application designed to help job seekers prep
 
 1. Clone the repository:
    ```
-   git clone <repository-url>
+   git clone (https://github.com/Revantabiswas/Inteview_Buddy)
    cd Interview
    ```
 
