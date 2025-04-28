@@ -1,19 +1,29 @@
 import os
 from langchain_groq import ChatGroq
+from langchain_community.chat_models import ChatOpenAI
 from functools import lru_cache
 from crewai import Agent, Task, Crew, Process
 import re
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Replace Streamlit caching with Python's lru_cache
 @lru_cache(maxsize=1)
 def get_llm():
     # Initialize Groq client
-    groq_api_key = os.environ.get("GROQ_API_KEY", "")
+    """ groq_api_key = os.environ.get("GROQ_API_KEY", "")
     
     # Configure the Groq LLM
     llm = ChatGroq(
         groq_api_key=groq_api_key,
         model_name="groq/qwen-qwq-32b",
+    )
+    return llm """
+    llm = ChatOpenAI(
+        model_name="gpt-4o-mini",
+        temperature=0.5,
+        timeout=10,
     )
     return llm
 
