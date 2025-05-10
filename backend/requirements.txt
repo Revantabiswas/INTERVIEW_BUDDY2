@@ -13,3 +13,7 @@ passlib
 bcrypt
 python-dotenv
 matplotlib
+PyPDF2
+langchain_groq
+crewai
+openai
