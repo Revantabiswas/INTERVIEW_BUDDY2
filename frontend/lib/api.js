@@ -780,6 +780,61 @@ const dsaApi = {
       throw new Error(error.response?.data?.detail || error.message || "Failed to analyze code");
     }
   },
+  
+  generateEdgeCases: async (problem, userSolution, language = "javascript") => {
+    try {
+      console.log("Generating edge cases with params:", { problem, language });
+      
+      const response = await axios({
+        method: 'post',
+        url: `${API_BASE_URL}/api/dsa/generate-edge-cases`,
+        data: {
+          problem_description: typeof problem === 'object' ? problem.description : problem,
+          solution_code: userSolution,
+          language,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 45000, // Longer timeout for AI edge case generation
+      });
+      
+      console.log("Edge cases generation response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error generating edge cases:", error);
+      console.error("Error details:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.detail || error.message || "Failed to generate edge cases");
+    }
+  },
+  
+  runEdgeTests: async (problem, userSolution, edgeCases, language = "javascript") => {
+    try {
+      console.log("Running edge tests with params:", { problem, edgeCases, language });
+      
+      const response = await axios({
+        method: 'post',
+        url: `${API_BASE_URL}/api/dsa/run-edge-tests`,
+        data: {
+          problem_description: typeof problem === 'object' ? problem.description : problem,
+          solution_code: userSolution,
+          edge_cases: edgeCases,
+          language,
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 30000,
+      });
+      
+      console.log("Edge tests results:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error running edge tests:", error);
+      console.error("Error details:", error.response?.data || error.message);
+      throw new Error(error.response?.data?.detail || error.message || "Failed to run edge tests");
+    }
+  },
 };
 
 // Progress Tracking API

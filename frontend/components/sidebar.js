@@ -21,45 +21,95 @@ import {
   X,
   BookMarked,
   Layers,
+  ChevronDown,
+  ChevronRight,
+  Files,
+  Bot,
+  FileText,
+  PanelLeftClose,
+  PanelLeft,
 } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 
+// Main navigation items
 const navItems = [
   { name: "Home", href: "/", icon: Home },
   { name: "DSA Practice", href: "/dsa-practice", icon: Code },
-  { name: "Document Upload", href: "/document-upload", icon: FileUp },
-  { name: "AI Chat", href: "/ai-chat", icon: MessageSquare },
-  { name: "Study Notes", href: "/study-notes", icon: BookOpen },
+  // Document workspace section is now handled separately
   { name: "Flashcards", href: "/flashcards", icon: BookMarked },
-  // { name: "Mind Maps", href: "/mind-maps", icon: Network },
   { name: "Study Roadmap", href: "/study-roadmap", icon: Map },
   { name: "Practice Tests", href: "/practice-tests", icon: FlaskConical },
-  { name: "Splash Screen", href: "/splash", icon: Layers },
-  // { name: "Code Debugging", href: "/code-debugging", icon: FileCode },
-  // { name: "Progress Tracking", href: "/progress", icon: BarChart2 },
+  { name: "Forums", href: "/community-forum", icon: FileCode },
   { name: "Settings", href: "/settings", icon: Settings },
+]
+
+// Document workspace section with nested items
+const documentItems = [
+  { name: "Document Workspace", href: "/document-workspace", icon: Files, isParent: true },
+  { name: "Upload Documents", href: "/document-workspace", icon: FileUp, isChild: true },
+  { name: "AI Chat Assistant", href: "/document-workspace", icon: Bot, isChild: true },
+  { name: "Study Notes", href: "/document-workspace", icon: BookOpen, isChild: true },
 ]
 
 export default function Sidebar() {
   const pathname = usePathname()
   const isMobile = useMobile()
   const [isOpen, setIsOpen] = useState(false)
+  const [documentSectionExpanded, setDocumentSectionExpanded] = useState(true)
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   useEffect(() => {
     // Close sidebar when route changes on mobile
     if (isMobile) {
       setIsOpen(false)
     }
+    
+    // Auto-expand document section when a document-related page is active
+    if (pathname.includes('document') || pathname.includes('ai-chat') || pathname.includes('study-notes')) {
+      setDocumentSectionExpanded(true)
+    }
+
+    // Load collapsed state from localStorage
+    const savedCollapsedState = localStorage.getItem('sidebarCollapsed')
+    if (savedCollapsedState !== null) {
+      setIsCollapsed(savedCollapsedState === 'true')
+    }
   }, [pathname, isMobile])
+
+  // Save collapse state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('sidebarCollapsed', isCollapsed.toString())
+    
+    // Dispatch custom event for direct communication with layout
+    window.dispatchEvent(new CustomEvent('sidebarToggle', {
+      detail: { isCollapsed }
+    }))
+  }, [isCollapsed])
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen)
   }
 
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed)
+  }
+
+  const toggleDocumentSection = () => {
+    setDocumentSectionExpanded(!documentSectionExpanded)
+  }
+
+  // Check if the current path matches a document section route
+  const isDocumentSectionActive = documentItems.some(item => 
+    pathname === item.href || 
+    (pathname.startsWith(item.href) && item.href !== '/')
+  )
+  
+
   return (
     <>
       {isMobile && (
-        <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50" onClick={toggleSidebar}>
+        <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50 md:top-5 md:left-5" onClick={toggleSidebar}>
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </Button>
       )}
@@ -67,50 +117,190 @@ export default function Sidebar() {
       <div
         className={`${
           isMobile
-            ? `fixed inset-y-0 left-0 z-40 w-64 transform transition-transform duration-300 ease-in-out ${
+            ? `fixed inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out ${
                 isOpen ? "translate-x-0" : "-translate-x-full"
               }`
-            : "w-64 border-r"
-        } bg-background`}
+            : "fixed inset-y-0 left-0 z-40"
+        } bg-background shadow-sm border-r transition-all duration-300 ease-in-out ${
+          isCollapsed ? "w-[70px]" : "w-64"
+        }`}
       >
         <div className="flex h-full flex-col">
-          <div className="flex items-center justify-between p-4">
-            <Link href="/" className="flex items-center space-x-2">
-              <Layers className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold">InterviewBuddy AI</span>
-            </Link>
+          <div className={`flex items-center p-4 ${isCollapsed ? "justify-center" : "justify-between"}`}>
+            {!isCollapsed ? (
+              <Link href="/" className="flex items-center space-x-2">
+                <Layers className="h-6 w-6 text-primary" />
+                <span className="text-xl font-bold">InterviewBuddy AI</span>
+              </Link>
+            ) : (
+              <Link href="/" className="flex items-center justify-center">
+                <Layers className="h-6 w-6 text-primary" />
+              </Link>
+            )}
           </div>
 
-          <div className="flex-1 overflow-auto py-2">
-            <nav className="space-y-1 px-2">
-              {navItems.map((item) => {
-                const isActive = pathname === item.href
-                const Icon = item.icon
+          <div className="flex-1 overflow-auto py-2 overflow-x-hidden">
+            <nav className={`space-y-1 ${isCollapsed ? "px-1" : "px-2"}`}>
+              {/* Regular nav items */}
+              <TooltipProvider delayDuration={300}>
+                {navItems.map((item) => {
+                  const isActive = pathname === item.href
+                  const Icon = item.icon
 
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                      isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
-                    }`}
-                  >
-                    <Icon className="mr-3 h-5 w-5" />
-                    {item.name}
-                  </Link>
-                )
-              })}
+                  return isCollapsed ? (
+                    <Tooltip key={item.name}>
+                      <TooltipTrigger asChild>
+                        <Link
+                          href={item.href}
+                          className={`flex items-center justify-center h-10 w-10 mx-auto my-1 rounded-md transition-colors ${
+                            isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
+                          }`}
+                        >
+                          <Icon className="h-5 w-5" />
+                        </Link>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        {item.name}
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                        isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      <Icon className="mr-3 h-5 w-5" />
+                      {item.name}
+                    </Link>
+                  )
+                })}
+              
+                {/* Document workspace section with collapsible menu */}
+                <div className="pt-2">
+                  {/* Parent item that toggles the section */}
+                  {isCollapsed ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          onClick={toggleDocumentSection}
+                          className={`flex items-center justify-center h-10 w-10 mx-auto my-1 rounded-md transition-colors ${
+                            isDocumentSectionActive ? "bg-primary/10 text-primary" : "text-foreground hover:bg-secondary"
+                          }`}
+                        >
+                          <Files className="h-5 w-5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">
+                        Document Workspace
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <button
+                      onClick={toggleDocumentSection}
+                      className={`flex w-full items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors
+                        ${isDocumentSectionActive ? "bg-primary/10 text-primary" : "text-foreground hover:bg-secondary"}
+                      `}
+                    >
+                      <div className="flex items-center">
+                        <Files className="mr-3 h-5 w-5" />
+                        <span>Document Workspace</span>
+                      </div>
+                      {documentSectionExpanded ? (
+                        <ChevronDown className="h-4 w-4" />
+                      ) : (
+                        <ChevronRight className="h-4 w-4" />
+                      )}
+                    </button>
+                  )}
+                  
+
+                  
+                  {/* Child items that appear when section is expanded */}
+                  {documentSectionExpanded && (
+                    <div className={isCollapsed ? "mt-1 space-y-1" : "ml-4 pl-2 border-l border-border/50 mt-1 space-y-1"}>
+                      {documentItems.filter(item => item.isChild).map((item) => {
+                        const isActive = pathname === item.href
+                        const Icon = item.icon
+                        
+                        return isCollapsed ? (
+                          <Tooltip key={item.name}>
+                            <TooltipTrigger asChild>
+                              <Link
+                                href={item.href}
+                                className={`flex items-center justify-center h-8 w-8 mx-auto my-1 rounded-md transition-colors ${
+                                  isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
+                                }`}
+                              >
+                                <Icon className="h-4 w-4" />
+                              </Link>
+                            </TooltipTrigger>
+                            <TooltipContent side="right">
+                              {item.name}
+                            </TooltipContent>
+                          </Tooltip>
+                        ) : (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                              isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
+                            }`}
+                          >
+                            <Icon className="mr-3 h-5 w-5" />
+                            {item.name}
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
+              </TooltipProvider>
             </nav>
           </div>
 
-          <div className="border-t p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Theme</span>
-              <ModeToggle />
-            </div>
+          <div className={`border-t p-4 ${isCollapsed ? "flex justify-center" : ""}`}>
+            {isCollapsed ? (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon"
+                      onClick={toggleCollapse}
+                      className="h-10 w-10 rounded-full hover:bg-secondary"
+                    >
+                      <PanelLeft className="h-5 w-5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    Expand Sidebar
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ) : (
+              <div className="flex items-center justify-between">
+                <Button 
+                  variant="ghost" 
+                  size="icon"
+                  onClick={toggleCollapse}
+                  className="h-8 w-8 rounded-full hover:bg-secondary"
+                >
+                  <PanelLeftClose className="h-4 w-4" />
+                </Button>
+                <span className="text-sm text-muted-foreground">Theme</span>
+                <ModeToggle />
+              </div>
+            )}
           </div>
         </div>
       </div>
+
+      {/* Add spacer div to ensure main content is pushed over to make room for sidebar */}
+      {!isMobile && (
+        <div className={`transition-all duration-300 ease-in-out ${isCollapsed ? "ml-[70px]" : "ml-64"}`}></div>
+      )}
     </>
   )
 }

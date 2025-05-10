@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Code, FileUp, MessageSquare, BookOpen, Network, Calendar, FileCode, ChevronRight, Star, Zap } from "lucide-react";
+import Background from "./background";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -128,21 +129,7 @@ export default function Home() {
         {/* Enhanced Hero Section with 3D elements */}
         <section className="relative py-24 md:py-36 overflow-hidden">
           {/* Gradient background with animated glow */}
-          <div className="absolute inset-0 -z-10">
-            <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-background to-background"></div>
-            <motion.div
-              className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 blur-3xl"
-              animate={{
-                x: ["-25%", "25%", "-25%"],
-                opacity: [0.5, 0.7, 0.5],
-              }}
-              transition={{
-                duration: 15,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          </div>
+          {/* <Background /> */}
 
           {/* 3D Floating Elements with enhanced animations */}
           <motion.div
@@ -173,7 +160,7 @@ export default function Home() {
 
           {/* 3D Geometric Shapes with more dynamic animations */}
           <motion.div 
-            className="absolute top-20 left-[10%] w-20 h-20 rounded-lg border border-primary/20 backdrop-blur-sm"
+            className="absolute top-20 left-[10%] w-20 h-20 rounded-lg border border-primary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)] transform-gpu"
             animate={{
               rotate: [0, 360],
               scale: [1, 1.1, 1],
@@ -192,7 +179,7 @@ export default function Home() {
             }}
           />
           <motion.div 
-            className="absolute bottom-20 right-[10%] w-24 h-24 rounded-full border border-primary/20 backdrop-blur-sm"
+            className="absolute bottom-20 right-[10%] w-24 h-24 rounded-full border border-primary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)] transform-gpu"
             animate={{
               y: [0, -30, 0],
               x: [0, 15, 0],
@@ -204,7 +191,7 @@ export default function Home() {
             }}
           />
           <motion.div 
-            className="absolute top-1/3 right-[20%] w-16 h-16 rounded-md border border-primary/20 backdrop-blur-sm"
+            className="absolute top-1/3 right-[20%] w-16 h-16 rounded-md border border-primary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)] transform-gpu"
             animate={{
               rotate: [45, 0, 45],
               scale: [1, 1.2, 1],
@@ -225,7 +212,7 @@ export default function Home() {
             >
               <h1 className="text-4xl md:text-7xl font-bold mb-6 tracking-tight">
                 Ace Your Technical Interviews with{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-blue-500 to-violet-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-red-500 to-red-500">
                   InterviewBuddy AI
                 </span>
               </h1>
@@ -293,11 +280,12 @@ export default function Home() {
 
           {/* Enhanced 3D Code Blocks with animations */}
           <motion.div 
-            className="hidden lg:block absolute -left-20 top-1/3 w-80 h-48 bg-card/70 backdrop-blur-sm border border-border rounded-lg shadow-xl"
+            className="hidden lg:block absolute -left-20 top-1/3 w-80 h-48 bg-card/70 backdrop-blur-sm border border-border rounded-lg perspective-3d transform-3d shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgb(59,130,246,0.2)] transition-all duration-500"
             initial={{ x: -200, rotate: -12, opacity: 0 }}
             animate={{ x: 0, rotate: -12, opacity: 1 }}
             transition={{ duration: 1, delay: 1 }}
             whileHover={{ x: 20, y: -5, transition: { duration: 0.3 } }}
+            style={{ boxShadow: "0 20px 40px -15px rgba(0,0,0,0.1), 0 5px 20px -5px rgba(0,0,0,0.05)" }}
           >
             <div className="p-5 font-mono text-sm">
               <div className="flex space-x-2 mb-3">
@@ -320,11 +308,12 @@ export default function Home() {
           </motion.div>
 
           <motion.div 
-            className="hidden lg:block absolute -right-20 top-2/3 w-80 h-48 bg-card/70 backdrop-blur-sm border border-border rounded-lg shadow-xl"
+            className="hidden lg:block absolute -right-20 top-2/3 w-80 h-48 bg-card/70 backdrop-blur-sm border border-border rounded-lg perspective-3d transform-3d shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgb(59,130,246,0.2)] transition-all duration-500"
             initial={{ x: 200, rotate: 12, opacity: 0 }}
             animate={{ x: 0, rotate: 12, opacity: 1 }}
             transition={{ duration: 1, delay: 1.3 }}
             whileHover={{ x: -20, y: -5, transition: { duration: 0.3 } }}
+            style={{ boxShadow: "0 20px 40px -15px rgba(0,0,0,0.1), 0 5px 20px -5px rgba(0,0,0,0.05)" }}
           >
             <div className="p-5 font-mono text-sm">
               <div className="flex space-x-2 mb-3">

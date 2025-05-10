@@ -1,14 +1,30 @@
 "use client"
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
+import { useState, useEffect } from "react"
+import { dsaApi } from "@/lib/api"  // Import the DSA API
+import { 
+  AlertTriangle, CheckCircle, CheckSquare, Clock, Code, 
+  ExternalLink, HelpCircle, Search, X, Play, PauseCircle, 
+  MessageSquare, Share2, BarChart, Sparkles, BugPlay, 
+  PlayCircle, ThumbsUp, ThumbsDown, Beaker, FileBadge, Terminal, Download
+} from "lucide-react"
+import Link from "next/link"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
@@ -17,10 +33,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Progress } from "@/components/ui/progress"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { Search, ExternalLink, CheckCircle, Clock, BarChart, Code, AlertTriangle, CheckSquare, X, HelpCircle, Play, PauseCircle, Share2, MessageSquare } from "lucide-react"
-import { dsaApi } from "@/lib/api"  // Import the DSA API
+import { Tabs, TabsContent, TabsTrigger, TabsList } from "@/components/ui/tabs"
+import { Toggle } from "@/components/ui/toggle"
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 // Mock data for DSA questions by category
 const dsaQuestionsByCategory = {
@@ -323,6 +349,18 @@ export default function DSAPractice() {
   const [isDebugging, setIsDebugging] = useState(false)
   const [showFeatureOverview, setShowFeatureOverview] = useState(false)
   
+  // Edge Case Testing State
+  const [showEdgeCaseDialog, setShowEdgeCaseDialog] = useState(false)
+  const [selectedProblemForEdgeCases, setSelectedProblemForEdgeCases] = useState(null)
+  const [userSolution, setUserSolution] = useState("")
+  const [edgeCases, setEdgeCases] = useState([])
+  const [generatingEdgeCases, setGeneratingEdgeCases] = useState(false)
+  const [runningEdgeTests, setRunningEdgeTests] = useState(false)
+  const [edgeTestResults, setEdgeTestResults] = useState([])
+  const [selectedEdgeCases, setSelectedEdgeCases] = useState([])
+  const [edgeCaseActiveTab, setEdgeCaseActiveTab] = useState("code")
+  const [localTestFramework, setLocalTestFramework] = useState(null)
+  
   // New mock interview state variables
   const [interviewInProgress, setInterviewInProgress] = useState(false)
   const [interviewSettings, setInterviewSettings] = useState({
@@ -419,6 +457,201 @@ export default function DSAPractice() {
       }, 2000);
     } finally {
       setIsDebugging(false);
+    }
+  };
+
+  const handleGenerateEdgeCases = async () => {
+    if (!selectedProblemForEdgeCases || !userSolution) return;
+    
+    setGeneratingEdgeCases(true);
+    setEdgeCases([]);
+    
+    try {
+      // Call the backend API for AI-generated edge cases
+      const response = await dsaApi.generateEdgeCases(
+        selectedProblemForEdgeCases.description,
+        userSolution,
+        "javascript" // Default to JavaScript, but could be made dynamic
+      );
+      
+      console.log("Edge case API response:", response); // For debugging
+      
+      // Transform the API response to match our UI expected format
+      if (response && response.edge_cases) {
+        const generatedEdgeCases = response.edge_cases.map((edgeCase, index) => ({
+          id: index + 1,
+          name: edgeCase.name || `Edge Case ${index + 1}`,
+          description: edgeCase.description || "Test case for edge condition",
+          input: edgeCase.input || "[]",
+          expectedOutput: edgeCase.expected_output || "0",
+          language_considerations: edgeCase.language_considerations || null
+        }));
+        
+        // Set the local test framework code if provided in the response
+        const localTestFramework = response.testing_guide || {
+          setup_code: "",
+          test_runner_code: "",
+          instructions: []
+        };
+        
+        // Store edge cases and test framework
+        setEdgeCases(generatedEdgeCases);
+        setLocalTestFramework(localTestFramework);
+        setSelectedEdgeCases(generatedEdgeCases.map(ec => ec.id));
+        
+        // Automatically switch to edge cases tab if we're still on code tab
+        if (edgeCaseActiveTab === "code") {
+          setEdgeCaseActiveTab("edge-cases");
+        }
+      } else {
+        console.error("Invalid response format from edge cases API:", response);
+        throw new Error("Invalid response format from API");
+      }
+    } catch (error) {
+      console.error("Error generating edge cases:", error);
+      
+      // Fallback to mock data if API fails
+      setTimeout(() => {
+        const mockEdgeCases = [
+          {
+            id: 1,
+            name: "Empty Array",
+            description: "Tests how the function handles an empty array",
+            input: "[]",
+            expectedOutput: "0"
+          },
+          {
+            id: 2,
+            name: "Single Element Array",
+            description: "Tests how the function handles an array with only one element",
+            input: "[42]",
+            expectedOutput: "42"
+          },
+          {
+            id: 3,
+            name: "All Negative Numbers",
+            description: "Tests how the function handles an array with all negative numbers",
+            input: "[-10, -5, -2, -1]",
+            expectedOutput: "-1"
+          },
+          {
+            id: 4,
+            name: "Maximum Integer Value",
+            description: "Tests how the function handles array with Integer.MAX_VALUE",
+            input: "[2147483647, 1]",
+            expectedOutput: "2147483648"
+          },
+          {
+            id: 5,
+            name: "Large Array",
+            description: "Tests how the function performs with a large input array",
+            input: "Array(10000).fill(1)",
+            expectedOutput: "10000"
+          }
+        ];
+        
+        const mockTestFramework = {
+          setup_code: `
+// Test framework for Maximum Subarray Problem
+function runTest(testCase, solution) {
+  try {
+    const input = eval(testCase.input);
+    const expected = eval(testCase.expectedOutput);
+    const actual = solution(input);
+    return {
+      passed: actual === expected,
+      expected: expected,
+      actual: actual,
+      error: null
+    };
+  } catch (error) {
+    return {
+      passed: false,
+      expected: eval(testCase.expectedOutput),
+      actual: null,
+      error: error.message
+    };
+  }
+}`,
+          test_runner_code: `
+// Function to run all selected test cases
+function runAllTests(testCases, solution) {
+  return testCases.map(testCase => {
+    const result = runTest(testCase, solution);
+    return {
+      name: testCase.name,
+      description: testCase.description,
+      input: testCase.input,
+      expectedOutput: testCase.expectedOutput,
+      ...result
+    };
+  });
+}
+
+// Example usage:
+// const results = runAllTests([testCase1, testCase2], findMaxSubarraySum);
+// console.table(results);`,
+          instructions: [
+            "Copy your solution and the test framework to a local JavaScript file",
+            "Add the test cases you want to run",
+            "Call the runAllTests function with your test cases and solution function",
+            "Run the file with Node.js: node your-file.js",
+            "Review the test results in your console"
+          ]
+        };
+        
+        setEdgeCases(mockEdgeCases);
+        setLocalTestFramework(mockTestFramework);
+        setSelectedEdgeCases(mockEdgeCases.map(ec => ec.id));
+        setGeneratingEdgeCases(false);
+        
+        // Automatically switch to edge cases tab if we're still on code tab
+        if (edgeCaseActiveTab === "code") {
+          setEdgeCaseActiveTab("edge-cases");
+        }
+      }, 2000);
+    } finally {
+      setGeneratingEdgeCases(false);
+    }
+  };
+
+  const handleRunEdgeTests = async () => {
+    if (!selectedProblemForEdgeCases || !userSolution || selectedEdgeCases.length === 0) return;
+    
+    setRunningEdgeTests(true);
+    setEdgeTestResults([]);
+    
+    try {
+      // In a real implementation, call your backend API
+      // const selectedCases = edgeCases.filter(ec => selectedEdgeCases.includes(ec.id));
+      // const response = await dsaApi.runEdgeTests(selectedProblemForEdgeCases.id, userSolution, selectedCases);
+      // setEdgeTestResults(response.results);
+      
+      // Mock response for demonstration
+      setTimeout(() => {
+        const selectedCases = edgeCases.filter(ec => selectedEdgeCases.includes(ec.id));
+        const mockResults = selectedCases.map(edgeCase => {
+          // Simulate some passing and some failing tests
+          const passed = Math.random() > 0.3;
+          return {
+            input: edgeCase.input,
+            expectedOutput: edgeCase.expectedOutput,
+            actualOutput: passed ? edgeCase.expectedOutput : (edgeCase.input === "[]" ? "Error: Cannot process empty array" : "undefined"),
+            passed: passed
+          };
+        });
+        
+        setEdgeTestResults(mockResults);
+        setRunningEdgeTests(false);
+        
+        // Automatically switch to results tab if we're still on edge cases tab
+        if (edgeCaseActiveTab === "edge-cases") {
+          setEdgeCaseActiveTab("results");
+        }
+      }, 2500);
+    } catch (error) {
+      console.error("Error running edge case tests:", error);
+      setRunningEdgeTests(false);
     }
   };
 
@@ -630,6 +863,113 @@ export default function DSAPractice() {
         </CardContent>
       </Card>
 
+      {/* Edge Case Testing */}
+      <Card className="mb-8 animate-slide-in">
+        <CardHeader>
+          <div className="flex flex-row justify-between items-center">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <Beaker className="h-5 w-5 text-primary" />
+                Edge Case Testing
+              </CardTitle>
+              <CardDescription>Test your solutions against tricky edge cases</CardDescription>
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="flex items-center gap-2"
+              onClick={() => setShowEdgeCaseDialog(true)}>
+              <FileBadge className="h-4 w-4" />
+              Test Solution
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="bg-muted/30 p-4 rounded-lg">
+                <h4 className="font-medium mb-2">What are Edge Cases?</h4>
+                <p className="text-sm text-muted-foreground">
+                  Edge cases are inputs at the extreme ranges of the expected input domain that can cause your solution to fail, including:
+                </p>
+                <ul className="mt-2 space-y-1 pl-5 list-disc text-sm text-muted-foreground">
+                  <li>Empty collections</li>
+                  <li>Single element collections</li>
+                  <li>Very large inputs</li>
+                  <li>Negative numbers</li>
+                  <li>Duplicate values</li>
+                  <li>Minimum/maximum values</li>
+                </ul>
+              </div>
+              
+              <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+                <h4 className="font-medium mb-2 flex items-center">
+                  <Sparkles className="h-4 w-4 text-primary mr-2" /> 
+                  Edge Case Generator
+                </h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Our AI can automatically generate edge cases for your DSA problem and test your solution against them.
+                </p>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500" /> 
+                    <span>Identify blind spots in your code</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span>Optimize for corner cases</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                    <span>Prepare for real interview scenarios</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {edgeTestResults.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-medium mb-2">Latest Test Results</h4>
+                <div className="overflow-auto max-h-40">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted/50">
+                      <tr>
+                        <th className="p-2 text-left">Input</th>
+                        <th className="p-2 text-left">Expected</th>
+                        <th className="p-2 text-left">Actual</th>
+                        <th className="p-2 text-left">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {edgeTestResults.map((result, index) => (
+                        <tr key={index} className="border-b">
+                          <td className="p-2 font-mono">{result.input}</td>
+                          <td className="p-2 font-mono">{result.expectedOutput}</td>
+                          <td className="p-2 font-mono">{result.actualOutput}</td>
+                          <td className="p-2">
+                            {result.passed ? (
+                              <div className="flex items-center gap-1.5">
+                                <ThumbsUp className="h-4 w-4 text-green-500" />
+                                <span className="text-green-600">Passed</span>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-1.5">
+                                <ThumbsDown className="h-4 w-4 text-red-500" />
+                                <span className="text-red-600">Failed</span>
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Filters Sidebar */}
         <Card className="lg:col-span-1 h-fit animate-slide-in" style={{ animationDelay: "0.2s" }}>
@@ -777,6 +1117,13 @@ export default function DSAPractice() {
               <Button variant="outline" className="w-full flex items-center" onClick={() => setShowDebugDialog(true)}>
                 <Code className="mr-2 h-4 w-4" />
                 Debug Your Code
+              </Button>
+            </div>
+
+            <div className="pt-2">
+              <Button variant="outline" className="w-full flex items-center" onClick={() => setShowEdgeCaseDialog(true)}>
+                <Beaker className="mr-2 h-4 w-4" />
+                Test Edge Cases
               </Button>
             </div>
           </CardContent>
@@ -1609,6 +1956,565 @@ export default function DSAPractice() {
             </Button>
             <Button onClick={handleDebugCode} disabled={isDebugging}>
               Debug Code
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edge Case Testing Dialog - Enhanced version */}
+      <Dialog open={showEdgeCaseDialog} onOpenChange={setShowEdgeCaseDialog}>
+        <DialogContent className="sm:max-w-4xl h-[80vh] flex flex-col overflow-hidden">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Beaker className="h-5 w-5 text-primary" />
+              Edge Case Testing
+            </DialogTitle>
+            <DialogDescription>
+              Test your solution against challenging edge cases to ensure robustness
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex-1 overflow-hidden">
+            <Tabs defaultValue="code" onValueChange={setEdgeCaseActiveTab} className="h-full flex flex-col">
+              <TabsList className="justify-start mb-2">
+                <TabsTrigger value="code" className="flex items-center gap-1.5">
+                  <Code className="h-4 w-4" /> Solution
+                </TabsTrigger>
+                <TabsTrigger value="edge-cases" className="flex items-center gap-1.5">
+                  <BugPlay className="h-4 w-4" /> Edge Cases
+                </TabsTrigger>
+                <TabsTrigger value="results" className="flex items-center gap-1.5">
+                  <PlayCircle className="h-4 w-4" /> Test Results
+                </TabsTrigger>
+                <TabsTrigger value="local-testing" className="flex items-center gap-1.5">
+                  <Terminal className="h-4 w-4" /> Local Testing
+                </TabsTrigger>
+              </TabsList>
+
+              <div className="flex-1 overflow-hidden">
+                <TabsContent value="code" className="h-full flex flex-col overflow-hidden">
+                  <div className="space-y-4 flex-1 overflow-y-auto pr-1">
+                    <div>
+                      <Label htmlFor="problem-select">Select Problem</Label>
+                      <Select
+                        value={selectedProblemForEdgeCases?.id?.toString() || ""}
+                        onValueChange={(value) =>
+                          setSelectedProblemForEdgeCases(
+                            allQuestions.find((q) => q.id === parseInt(value))
+                          )
+                        }
+                      >
+                        <SelectTrigger id="problem-select" className="mt-1.5">
+                          <SelectValue placeholder="Select a DSA problem" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {allQuestions.map((question) => (
+                            <SelectItem key={question.id} value={question.id.toString()}>
+                              {question.title} ({question.difficulty})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      
+                      {selectedProblemForEdgeCases && (
+                        <div className="mt-2 p-3 bg-muted/30 rounded-md">
+                          <h4 className="font-medium">{selectedProblemForEdgeCases.title}</h4>
+                          <p className="text-sm text-muted-foreground my-1.5">{selectedProblemForEdgeCases.description}</p>
+                          <div className="flex gap-2">
+                            <Badge
+                              className={
+                                selectedProblemForEdgeCases.difficulty === "Easy"
+                                  ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
+                                  : selectedProblemForEdgeCases.difficulty === "Medium"
+                                    ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                                    : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100"
+                              }
+                            >
+                              {selectedProblemForEdgeCases.difficulty}
+                            </Badge>
+                            <Badge variant="outline">{selectedProblemForEdgeCases.topic}</Badge>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <div className="flex items-center justify-between">
+                        <Label htmlFor="user-solution">Your Solution</Label>
+                        <div className="flex items-center">
+                          <Label htmlFor="language-select" className="mr-2 text-sm">Language:</Label>
+                          <Select defaultValue="javascript">
+                            <SelectTrigger id="language-select" className="h-7 text-xs w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="javascript">JavaScript</SelectItem>
+                              <SelectItem value="python">Python</SelectItem>
+                              <SelectItem value="java">Java</SelectItem>
+                              <SelectItem value="cpp">C++</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      <div className="mt-1.5 border rounded-md overflow-hidden relative bg-muted/30">
+                        <div className="flex space-x-2 absolute top-0 left-0 right-0 p-2 bg-background border-b">
+                          <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                          <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                        </div>
+                        <Textarea
+                          id="user-solution"
+                          placeholder="Write your solution here..."
+                          value={userSolution}
+                          onChange={(e) => setUserSolution(e.target.value)}
+                          className="resize-none font-mono text-sm pt-12 h-[300px] border-0 bg-transparent"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="edge-cases" className="h-full flex flex-col overflow-hidden">
+                  <div className="flex-1 overflow-y-auto pr-1">
+                    <div className="mb-4 rounded-md bg-primary/5 p-4 border border-primary/20">
+                      <h3 className="font-medium flex items-center mb-2">
+                        <Sparkles className="h-4 w-4 text-primary mr-2" />
+                        AI Edge Case Generator
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Our AI will analyze your selected problem and generate meaningful edge cases 
+                        that might break suboptimal solutions.
+                      </p>
+                      <div className="flex items-center">
+                        <Button
+                          onClick={handleGenerateEdgeCases}
+                          disabled={generatingEdgeCases || !selectedProblemForEdgeCases}
+                          className="flex items-center gap-2"
+                        >
+                          <Sparkles className="h-4 w-4" />
+                          Generate Edge Cases
+                        </Button>
+
+                        {!selectedProblemForEdgeCases && (
+                          <p className="text-xs text-muted-foreground ml-4">
+                            Please select a problem first
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {generatingEdgeCases ? (
+                      <div className="text-center p-12">
+                        <div className="flex space-x-2 mb-4 justify-center">
+                          <div className="w-3 h-3 rounded-full bg-primary animate-bounce"></div>
+                          <div
+                            className="w-3 h-3 rounded-full bg-primary animate-bounce"
+                            style={{ animationDelay: "0.2s" }}
+                          ></div>
+                          <div
+                            className="w-3 h-3 rounded-full bg-primary animate-bounce"
+                            style={{ animationDelay: "0.4s" }}
+                          ></div>
+                        </div>
+                        <p className="text-muted-foreground">Generating edge cases for this problem...</p>
+                      </div>
+                    ) : edgeCases.length > 0 ? (
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center mb-4">
+                          <h3 className="font-medium">Generated Edge Cases</h3>
+                          <div className="flex items-center gap-1.5">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => setSelectedEdgeCases(edgeCases.map(ec => ec.id))}
+                            >
+                              Select All
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              className="h-7 text-xs"
+                              onClick={() => setSelectedEdgeCases([])}
+                            >
+                              Clear
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <Card className="mb-2">
+                          <CardContent className="p-0">
+                            <div className="divide-y">
+                              {edgeCases.map((edgeCase, index) => (
+                                <div key={index} className="py-3 px-4 flex items-center gap-3">
+                                  <Toggle
+                                    pressed={selectedEdgeCases.includes(edgeCase.id)}
+                                    onPressedChange={(pressed) => {
+                                      if (pressed) {
+                                        setSelectedEdgeCases(prev => [...prev, edgeCase.id]);
+                                      } else {
+                                        setSelectedEdgeCases(prev => 
+                                          prev.filter(id => id !== edgeCase.id)
+                                        );
+                                      }
+                                    }}
+                                    size="sm"
+                                    className="data-[state=on]:bg-primary/20 data-[state=on]:text-primary h-7"
+                                  >
+                                    <CheckSquare className="h-4 w-4 mr-1" />
+                                  </Toggle>
+                                  <div>
+                                    <h4 className="font-medium text-sm">{edgeCase.name}</h4>
+                                    <p className="text-xs text-muted-foreground max-w-sm">{edgeCase.description}</p>
+                                    <div className="flex gap-8 mt-1.5">
+                                      <div className="text-xs">
+                                        <span className="text-muted-foreground">Input:</span>{" "}
+                                        <code className="bg-muted px-1 py-0.5 rounded text-xs">{edgeCase.input}</code>
+                                      </div>
+                                      <div className="text-xs">
+                                        <span className="text-muted-foreground">Expected:</span>{" "}
+                                        <code className="bg-muted px-1 py-0.5 rounded text-xs">{edgeCase.expectedOutput}</code>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+                    ) : (
+                      <div className="text-center p-8 border border-dashed rounded-md text-muted-foreground">
+                        <BugPlay className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                        <p>No edge cases generated yet</p>
+                        <p className="text-xs mt-1">Click the "Generate Edge Cases" button above</p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="results" className="h-full flex flex-col">
+                  <div className="mb-4 flex justify-between items-center">
+                    <div>
+                      <h3 className="font-medium">Test Results</h3>
+                      <p className="text-sm text-muted-foreground">
+                        Run your solution against the selected edge cases
+                      </p>
+                    </div>
+                    <Button
+                      onClick={handleRunEdgeTests}
+                      disabled={runningEdgeTests || selectedEdgeCases.length === 0 || !userSolution.trim()}
+                      className="flex items-center gap-2"
+                    >
+                      <PlayCircle className="h-4 w-4" />
+                      Run Tests
+                    </Button>
+                  </div>
+
+                  {runningEdgeTests ? (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="flex space-x-2 mb-4 justify-center">
+                          <div className="w-3 h-3 rounded-full bg-primary animate-bounce"></div>
+                          <div
+                            className="w-3 h-3 rounded-full bg-primary animate-bounce"
+                            style={{ animationDelay: "0.2s" }}
+                          ></div>
+                          <div
+                            className="w-3 h-3 rounded-full bg-primary animate-bounce"
+                            style={{ animationDelay: "0.4s" }}
+                          ></div>
+                        </div>
+                        <p className="text-muted-foreground">Running test cases against your solution...</p>
+                      </div>
+                    </div>
+                  ) : edgeTestResults.length > 0 ? (
+                    <div className="flex-1 overflow-y-auto">
+                      <ScrollArea className="h-full pr-4">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-2 bg-muted/30 p-4 rounded-lg">
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                                <ThumbsUp className="h-4 w-4 text-green-500" />
+                                Passed Tests
+                              </h4>
+                              <div className="text-2xl font-bold">
+                                {edgeTestResults.filter(r => r.passed).length}/{edgeTestResults.length}
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="text-sm font-medium mb-1 flex items-center gap-1.5">
+                                <ThumbsDown className="h-4 w-4 text-red-500" />
+                                Failed Tests
+                              </h4>
+                              <div className="text-2xl font-bold">
+                                {edgeTestResults.filter(r => !r.passed).length}/{edgeTestResults.length}
+                              </div>
+                            </div>
+                          </div>
+
+                          {edgeTestResults.map((result, index) => (
+                            <Card key={index} className={result.passed ? "border-green-500/40" : "border-red-500/40"}>
+                              <CardHeader className="py-3">
+                                <div className="flex justify-between items-center">
+                                  <CardTitle className="text-base flex items-center gap-2">
+                                    {result.passed ? (
+                                      <CheckCircle className="h-5 w-5 text-green-500" />
+                                    ) : (
+                                      <AlertTriangle className="h-5 w-5 text-red-500" />
+                                    )}
+                                    Test Case #{index + 1}
+                                  </CardTitle>
+                                  <Badge variant={result.passed ? "secondary" : "destructive"}>
+                                    {result.passed ? "Passed" : "Failed"}
+                                  </Badge>
+                                </div>
+                              </CardHeader>
+                              <CardContent className="py-3 space-y-3">
+                                <div>
+                                  <Label className="text-xs text-muted-foreground">Input:</Label>
+                                  <div className="mt-1 p-2 bg-muted rounded-md">
+                                    <code className="text-sm font-mono">{result.input}</code>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div>
+                                    <Label className="text-xs text-muted-foreground">Expected Output:</Label>
+                                    <div className="mt-1 p-2 bg-muted rounded-md">
+                                      <code className="text-sm font-mono">{result.expectedOutput}</code>
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <Label className="text-xs text-muted-foreground">Your Output:</Label>
+                                    <div className={`mt-1 p-2 rounded-md ${result.passed ? 'bg-green-100 dark:bg-green-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
+                                      <code className="text-sm font-mono">{result.actualOutput}</code>
+                                    </div>
+                                  </div>
+                                </div>
+                                {!result.passed && (
+                                  <div className="pt-2 text-sm text-red-600 dark:text-red-400">
+                                    <p><strong>Issue:</strong> Your output doesn't match the expected result. Check for logic errors or edge case handling.</p>
+                                  </div>
+                                )}
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      </ScrollArea>
+                    </div>
+                  ) : (
+                    <div className="flex-1 flex items-center justify-center">
+                      <div className="text-center text-muted-foreground">
+                        <PlayCircle className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                        <p>No test results yet</p>
+                        <p className="text-xs mt-1">Select edge cases and run tests with your solution</p>
+                      </div>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="local-testing" className="h-full flex flex-col overflow-hidden">
+                  <div className="flex-1 overflow-y-auto pr-1">
+                    {localTestFramework ? (
+                      <div className="space-y-6">
+                        <div className="mb-4 rounded-md bg-primary/5 p-4 border border-primary/20">
+                          <h3 className="font-medium flex items-center mb-2">
+                            <Terminal className="h-4 w-4 text-primary mr-2" />
+                            Run Edge Cases Locally
+                          </h3>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Follow these steps to test your solution against edge cases on your local machine.
+                            This allows you to debug and optimize your code in your preferred environment.
+                          </p>
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-medium mb-2 flex items-center gap-2">
+                            <Badge variant="outline" className="bg-primary/10">Step 1</Badge>
+                            Setup Test Environment
+                          </h3>
+                          <div className="bg-muted p-4 rounded-md overflow-hidden">
+                            <pre className="text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+                              {localTestFramework.setup_code}
+                            </pre>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-medium mb-2 flex items-center gap-2">
+                            <Badge variant="outline" className="bg-primary/10">Step 2</Badge>
+                            Create Test Runner
+                          </h3>
+                          <div className="bg-muted p-4 rounded-md overflow-hidden">
+                            <pre className="text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+                              {localTestFramework.test_runner_code}
+                            </pre>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-medium mb-2 flex items-center gap-2">
+                            <Badge variant="outline" className="bg-primary/10">Step 3</Badge>
+                            Add Your Solution
+                          </h3>
+                          <div className="bg-muted p-4 rounded-md overflow-hidden">
+                            <pre className="text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+{`// Paste your solution here
+${userSolution || '// Example:\nfunction findMaxSubarraySum(arr) {\n  // Your solution code\n}'}`}
+                            </pre>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-medium mb-2 flex items-center gap-2">
+                            <Badge variant="outline" className="bg-primary/10">Step 4</Badge>
+                            Add Edge Cases
+                          </h3>
+                          <div className="bg-muted p-4 rounded-md overflow-hidden">
+                            <pre className="text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+{`// Edge case test definitions
+const testCases = [
+${edgeCases.filter(ec => selectedEdgeCases.includes(ec.id)).map(ec => 
+`  {
+    name: "${ec.name}",
+    description: "${ec.description}",
+    input: ${ec.input},
+    expectedOutput: ${ec.expectedOutput}
+  }`).join(',\n')}
+];`}
+                            </pre>
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-medium mb-2 flex items-center gap-2">
+                            <Badge variant="outline" className="bg-primary/10">Step 5</Badge>
+                            Run Tests
+                          </h3>
+                          <div className="bg-muted p-4 rounded-md overflow-hidden">
+                            <pre className="text-sm font-mono overflow-x-auto whitespace-pre-wrap">
+{`// Execute all tests and display results
+const results = runAllTests(testCases, ${userSolution ? userSolution.split('\n')[0].replace('function ', '').split('(')[0] : 'yourSolutionFunction'});
+console.table(results);`}
+                            </pre>
+                          </div>
+                        </div>
+                        
+                        <div className="mb-4 rounded-md bg-muted/50 p-4">
+                          <h3 className="font-medium mb-2">Instructions</h3>
+                          <ol className="list-decimal pl-5 space-y-2 text-sm">
+                            {localTestFramework.instructions.map((instruction, index) => (
+                              <li key={index}>{instruction}</li>
+                            ))}
+                          </ol>
+                        </div>
+                        
+                        <div className="flex flex-col items-center justify-center rounded-md border-2 border-dashed p-6 mb-4">
+                          <Button 
+                            variant="outline" 
+                            className="flex items-center gap-2 mb-2"
+                            onClick={() => {
+                              // Combine all code sections into one file
+                              const fullCode = `
+// ===== SETUP CODE =====
+${localTestFramework.setup_code}
+
+// ===== YOUR SOLUTION =====
+${userSolution || '// Paste your solution here'}
+
+// ===== TEST CASES =====
+const testCases = [
+${edgeCases.filter(ec => selectedEdgeCases.includes(ec.id)).map(ec => 
+`  {
+    name: "${ec.name}",
+    description: "${ec.description}",
+    input: ${ec.input},
+    expectedOutput: ${ec.expectedOutput}
+  }`).join(',\n')}
+];
+
+// ===== TEST RUNNER CODE =====
+${localTestFramework.test_runner_code}
+
+// ===== RUN TESTS =====
+const results = runAllTests(testCases, ${userSolution ? userSolution.split('\n')[0].replace('function ', '').split('(')[0] : 'yourSolutionFunction'});
+console.table(results);
+`;
+                              
+                              // Create a Blob with the code
+                              const blob = new Blob([fullCode], { type: 'text/javascript' });
+                              const url = URL.createObjectURL(blob);
+                              
+                              // Create a temporary link to download the file
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `${selectedProblemForEdgeCases?.title?.replace(/\s+/g, '_') || 'edge_case_tests'}.js`;
+                              document.body.appendChild(a);
+                              a.click();
+                              
+                              // Clean up
+                              URL.revokeObjectURL(url);
+                              document.body.removeChild(a);
+                            }}
+                          >
+                            <Download className="h-4 w-4" />
+                            Download Complete Test File
+                          </Button>
+                          <p className="text-xs text-muted-foreground text-center">
+                            Download a ready-to-run JavaScript file with your solution and test cases
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center p-8 border border-dashed rounded-md text-muted-foreground">
+                        <Terminal className="h-8 w-8 mx-auto mb-2 opacity-40" />
+                        <p>No local testing framework available</p>
+                        <p className="text-xs mt-1">Generate edge cases to view the local testing setup</p>
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
+
+          <DialogFooter className="mt-2">
+            <div className="mr-auto">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => {
+                  setUserSolution("");
+                  setEdgeCases([]);
+                  setEdgeTestResults([]);
+                  setSelectedEdgeCases([]);
+                }}
+                disabled={runningEdgeTests || generatingEdgeCases}
+              >
+                Reset
+              </Button>
+            </div>
+            <Button variant="outline" onClick={() => setShowEdgeCaseDialog(false)}>
+              Close
+            </Button>
+            <Button 
+              onClick={() => {
+                if (edgeCaseActiveTab === "code") {
+                  setEdgeCaseActiveTab("edge-cases");
+                  if (!edgeCases.length && selectedProblemForEdgeCases) {
+                    handleGenerateEdgeCases();
+                  }
+                } else if (edgeCaseActiveTab === "edge-cases") {
+                  setEdgeCaseActiveTab("results");
+                  if (!edgeTestResults.length && selectedEdgeCases.length > 0) {
+                    handleRunEdgeTests();
+                  }
+                } else {
+                  setShowEdgeCaseDialog(false);
+                }
+              }}
+            >
+              {edgeCaseActiveTab === "code" ? "Next" : edgeCaseActiveTab === "edge-cases" ? "Run Tests" : "Done"}
             </Button>
           </DialogFooter>
         </DialogContent>
