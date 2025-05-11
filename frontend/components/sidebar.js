@@ -5,6 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { ModeToggle } from "@/components/mode-toggle"
+import { useAuth } from "@/components/auth-provider"
 import {
   Code,
   FileUp,
@@ -28,9 +29,11 @@ import {
   FileText,
   PanelLeftClose,
   PanelLeft,
+  LogOut,
 } from "lucide-react"
 import { useMobile } from "@/hooks/use-mobile"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useToast } from "@/components/ui/use-toast"
 
 // Main navigation items
 const navItems = [
@@ -58,33 +61,37 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const [documentSectionExpanded, setDocumentSectionExpanded] = useState(true)
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const { user, signOut } = useAuth()
+  const { toast } = useToast()
 
   useEffect(() => {
     // Close sidebar when route changes on mobile
     if (isMobile) {
       setIsOpen(false)
     }
-    
+
     // Auto-expand document section when a document-related page is active
-    if (pathname.includes('document') || pathname.includes('ai-chat') || pathname.includes('study-notes')) {
+    if (pathname.includes("document") || pathname.includes("ai-chat") || pathname.includes("study-notes")) {
       setDocumentSectionExpanded(true)
     }
 
     // Load collapsed state from localStorage
-    const savedCollapsedState = localStorage.getItem('sidebarCollapsed')
+    const savedCollapsedState = localStorage.getItem("sidebarCollapsed")
     if (savedCollapsedState !== null) {
-      setIsCollapsed(savedCollapsedState === 'true')
+      setIsCollapsed(savedCollapsedState === "true")
     }
   }, [pathname, isMobile])
 
   // Save collapse state to localStorage when it changes
   useEffect(() => {
-    localStorage.setItem('sidebarCollapsed', isCollapsed.toString())
-    
+    localStorage.setItem("sidebarCollapsed", isCollapsed.toString())
+
     // Dispatch custom event for direct communication with layout
-    window.dispatchEvent(new CustomEvent('sidebarToggle', {
-      detail: { isCollapsed }
-    }))
+    window.dispatchEvent(
+      new CustomEvent("sidebarToggle", {
+        detail: { isCollapsed },
+      })
+    )
   }, [isCollapsed])
 
   const toggleSidebar = () => {
@@ -99,17 +106,37 @@ export default function Sidebar() {
     setDocumentSectionExpanded(!documentSectionExpanded)
   }
 
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+      toast({
+        title: "Signed out successfully",
+        description: "You have been logged out of your account.",
+      })
+    } catch (error) {
+      console.error("Error signing out:", error)
+      toast({
+        title: "Sign out failed",
+        description: "There was an error signing you out. Please try again.",
+        variant: "destructive",
+      })
+    }
+  }
+
   // Check if the current path matches a document section route
-  const isDocumentSectionActive = documentItems.some(item => 
-    pathname === item.href || 
-    (pathname.startsWith(item.href) && item.href !== '/')
+  const isDocumentSectionActive = documentItems.some(
+    (item) => pathname === item.href || (pathname.startsWith(item.href) && item.href !== "/")
   )
-  
 
   return (
     <>
       {isMobile && (
-        <Button variant="ghost" size="icon" className="fixed top-4 left-4 z-50 md:top-5 md:left-5" onClick={toggleSidebar}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="fixed top-4 left-4 z-50 md:top-5 md:left-5"
+          onClick={toggleSidebar}
+        >
           {isOpen ? <X size={24} /> : <Menu size={24} />}
         </Button>
       )}
@@ -159,9 +186,7 @@ export default function Sidebar() {
                           <Icon className="h-5 w-5" />
                         </Link>
                       </TooltipTrigger>
-                      <TooltipContent side="right">
-                        {item.name}
-                      </TooltipContent>
+                      <TooltipContent side="right">{item.name}</TooltipContent>
                     </Tooltip>
                   ) : (
                     <Link
@@ -176,7 +201,7 @@ export default function Sidebar() {
                     </Link>
                   )
                 })}
-              
+
                 {/* Document workspace section with collapsible menu */}
                 <div className="pt-2">
                   {/* Parent item that toggles the section */}
@@ -186,21 +211,25 @@ export default function Sidebar() {
                         <button
                           onClick={toggleDocumentSection}
                           className={`flex items-center justify-center h-10 w-10 mx-auto my-1 rounded-md transition-colors ${
-                            isDocumentSectionActive ? "bg-primary/10 text-primary" : "text-foreground hover:bg-secondary"
+                            isDocumentSectionActive
+                              ? "bg-primary/10 text-primary"
+                              : "text-foreground hover:bg-secondary"
                           }`}
                         >
                           <Files className="h-5 w-5" />
                         </button>
                       </TooltipTrigger>
-                      <TooltipContent side="right">
-                        Document Workspace
-                      </TooltipContent>
+                      <TooltipContent side="right">Document Workspace</TooltipContent>
                     </Tooltip>
                   ) : (
                     <button
                       onClick={toggleDocumentSection}
                       className={`flex w-full items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-colors
-                        ${isDocumentSectionActive ? "bg-primary/10 text-primary" : "text-foreground hover:bg-secondary"}
+                        ${
+                          isDocumentSectionActive
+                            ? "bg-primary/10 text-primary"
+                            : "text-foreground hover:bg-secondary"
+                        }
                       `}
                     >
                       <div className="flex items-center">
@@ -214,45 +243,53 @@ export default function Sidebar() {
                       )}
                     </button>
                   )}
-                  
 
-                  
                   {/* Child items that appear when section is expanded */}
                   {documentSectionExpanded && (
-                    <div className={isCollapsed ? "mt-1 space-y-1" : "ml-4 pl-2 border-l border-border/50 mt-1 space-y-1"}>
-                      {documentItems.filter(item => item.isChild).map((item) => {
-                        const isActive = pathname === item.href
-                        const Icon = item.icon
-                        
-                        return isCollapsed ? (
-                          <Tooltip key={item.name}>
-                            <TooltipTrigger asChild>
-                              <Link
-                                href={item.href}
-                                className={`flex items-center justify-center h-8 w-8 mx-auto my-1 rounded-md transition-colors ${
-                                  isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
-                                }`}
-                              >
-                                <Icon className="h-4 w-4" />
-                              </Link>
-                            </TooltipTrigger>
-                            <TooltipContent side="right">
+                    <div
+                      className={
+                        isCollapsed
+                          ? "mt-1 space-y-1"
+                          : "ml-4 pl-2 border-l border-border/50 mt-1 space-y-1"
+                      }
+                    >
+                      {documentItems
+                        .filter((item) => item.isChild)
+                        .map((item) => {
+                          const isActive = pathname === item.href
+                          const Icon = item.icon
+
+                          return isCollapsed ? (
+                            <Tooltip key={item.name}>
+                              <TooltipTrigger asChild>
+                                <Link
+                                  href={item.href}
+                                  className={`flex items-center justify-center h-8 w-8 mx-auto my-1 rounded-md transition-colors ${
+                                    isActive
+                                      ? "bg-primary text-primary-foreground"
+                                      : "text-foreground hover:bg-secondary"
+                                  }`}
+                                >
+                                  <Icon className="h-4 w-4" />
+                                </Link>
+                              </TooltipTrigger>
+                              <TooltipContent side="right">{item.name}</TooltipContent>
+                            </Tooltip>
+                          ) : (
+                            <Link
+                              key={item.name}
+                              href={item.href}
+                              className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                                isActive
+                                  ? "bg-primary text-primary-foreground"
+                                  : "text-foreground hover:bg-secondary"
+                              }`}
+                            >
+                              <Icon className="mr-3 h-5 w-5" />
                               {item.name}
-                            </TooltipContent>
-                          </Tooltip>
-                        ) : (
-                          <Link
-                            key={item.name}
-                            href={item.href}
-                            className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-                              isActive ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
-                            }`}
-                          >
-                            <Icon className="mr-3 h-5 w-5" />
-                            {item.name}
-                          </Link>
-                        )
-                      })}
+                            </Link>
+                          )
+                        })}
                     </div>
                   )}
                 </div>
@@ -260,13 +297,45 @@ export default function Sidebar() {
             </nav>
           </div>
 
-          <div className={`border-t p-4 ${isCollapsed ? "flex justify-center" : ""}`}>
+          <div className={`border-t ${isCollapsed ? "p-2" : "p-4"} flex flex-col gap-2`}>
+            {user && (
+              <>
+                {isCollapsed ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={handleSignOut}
+                          className="h-10 w-10 rounded-full hover:bg-secondary text-red-500 hover:text-red-600"
+                        >
+                          <LogOut className="h-5 w-5" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">Sign out</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    onClick={handleSignOut}
+                    className="justify-start px-3 text-red-500 hover:text-red-600 hover:bg-red-100/10"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign out
+                  </Button>
+                )}
+                <div className="border-t my-1"></div>
+              </>
+            )}
+
             {isCollapsed ? (
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="icon"
                       onClick={toggleCollapse}
                       className="h-10 w-10 rounded-full hover:bg-secondary"
@@ -274,15 +343,13 @@ export default function Sidebar() {
                       <PanelLeft className="h-5 w-5" />
                     </Button>
                   </TooltipTrigger>
-                  <TooltipContent side="right">
-                    Expand Sidebar
-                  </TooltipContent>
+                  <TooltipContent side="right">Expand Sidebar</TooltipContent>
                 </Tooltip>
               </TooltipProvider>
             ) : (
               <div className="flex items-center justify-between">
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="icon"
                   onClick={toggleCollapse}
                   className="h-8 w-8 rounded-full hover:bg-secondary"
