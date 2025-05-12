@@ -33,6 +33,7 @@ from routers.tests import router as tests_router
 from routers.roadmaps import router as roadmaps_router
 from routers.dsa import router as dsa_router
 from routers.progress import router as progress_router
+from routers.forum import router as forum_router  # Import forum router
 
 # Document processing
 import fitz  # PyMuPDF
@@ -202,6 +203,7 @@ app.include_router(tests_router, prefix="/api/tests", tags=["tests"])
 app.include_router(roadmaps_router, prefix="/api/roadmaps", tags=["roadmaps"])
 app.include_router(dsa_router, prefix="/api/dsa", tags=["dsa"])
 app.include_router(progress_router, prefix="/api/progress", tags=["progress"])
+app.include_router(forum_router, prefix="/api/forum", tags=["forum"])  # Register forum router
 
 # Error handling middleware
 @app.middleware("http")

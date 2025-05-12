@@ -155,14 +155,48 @@ export default function Sidebar() {
         <div className="flex h-full flex-col">
           <div className={`flex items-center p-4 ${isCollapsed ? "justify-center" : "justify-between"}`}>
             {!isCollapsed ? (
-              <Link href="/" className="flex items-center space-x-2">
-                <Layers className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold">InterviewBuddy AI</span>
-              </Link>
+              <>
+                <Link href="/" className="flex items-center space-x-2">
+                  <Layers className="h-6 w-6 text-primary" />
+                  <span className="text-xl font-bold">InterviewBuddy AI</span>
+                </Link>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={toggleCollapse}
+                        className="h-8 w-8 rounded-full hover:bg-secondary ml-2"
+                      >
+                        <PanelLeftClose className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Collapse Sidebar</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </>
             ) : (
-              <Link href="/" className="flex items-center justify-center">
-                <Layers className="h-6 w-6 text-primary" />
-              </Link>
+              <>
+                <Link href="/" className="flex items-center justify-center">
+                  <Layers className="h-6 w-6 text-primary" />
+                </Link>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={toggleCollapse}
+                        className="h-8 w-8 rounded-full hover:bg-secondary absolute top-4 right-1"
+                      >
+                        <PanelLeft className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">Expand Sidebar</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </>
             )}
           </div>
 
@@ -331,32 +365,10 @@ export default function Sidebar() {
             )}
 
             {isCollapsed ? (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={toggleCollapse}
-                      className="h-10 w-10 rounded-full hover:bg-secondary"
-                    >
-                      <PanelLeft className="h-5 w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">Expand Sidebar</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <ModeToggle collapsed={true} />
             ) : (
-              <div className="flex items-center justify-between">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleCollapse}
-                  className="h-8 w-8 rounded-full hover:bg-secondary"
-                >
-                  <PanelLeftClose className="h-4 w-4" />
-                </Button>
-                <span className="text-sm text-muted-foreground">Theme</span>
+              <div className="flex items-center justify-end">
+                <span className="text-sm text-muted-foreground mr-2">Theme</span>
                 <ModeToggle />
               </div>
             )}

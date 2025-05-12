@@ -14693,3 +14693,775 @@ LiteLLM: Non-Default params passed to completion() {'temperature': 0.7, 'stream'
 2025-04-21 17:12:02,974 - LiteLLM - DEBUG - checking potential_model_names in litellm.model_cost: {'split_model': 'qwen-qwq-32b', 'combined_model_name': 'groq/qwen-qwq-32b', 'stripped_model_name': 'qwen-qwq-32b', 'combined_stripped_model_name': 'groq/qwen-qwq-32b', 'custom_llm_provider': 'groq'}
 2025-04-21 17:12:02,976 - LiteLLM - DEBUG - Error getting model info: This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json
 2025-04-21 17:12:02,976 - LiteLLM - DEBUG - Model=groq/qwen-qwq-32b is not mapped in model cost map. Defaulting to None model_cost_information for standard_logging_payload
+2025-05-11 17:06:09,457 - main - INFO - Ensured directory exists: ./storage
+2025-05-11 17:06:09,458 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-11 17:06:09,458 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-11 17:06:09,459 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-11 17:06:09,459 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-11 17:06:09,459 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-11 17:06:09,460 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-11 17:06:09,460 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-11 17:06:09,460 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-11 17:06:09,473 - main - INFO - Starting up application...
+2025-05-11 17:06:09,473 - main - INFO - Ensured directory exists: ./storage
+2025-05-11 17:06:09,474 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-11 17:06:09,474 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-11 17:06:09,474 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-11 17:06:09,475 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-11 17:06:09,475 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-11 17:06:09,475 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-11 17:06:09,476 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-11 17:06:09,477 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-11 17:19:12,792 - routers.chat - ERROR - Error in chat: 1 validation error for ChatOpenAI
+  Value error, Did not find openai_api_key, please add an environment variable `OPENAI_API_KEY` which contains it, or pass `openai_api_key` as a named parameter. [type=value_error, input_value={'model_name': 'gpt-4o-mi...ne, 'http_client': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/value_error
+Traceback (most recent call last):
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\routers\chat.py", line 147, in chat
+    tutor_agent = create_study_tutor_agent()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\agents.py", line 119, in create_study_tutor_agent
+    llm=get_llm(),
+        ^^^^^^^^^
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\agents.py", line 23, in get_llm
+    llm = ChatOpenAI(
+          ^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\langchain_core\_api\deprecation.py", line 224, in warn_if_direct_instance
+    return wrapped(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\langchain_core\load\serializable.py", line 130, in __init__
+    super().__init__(*args, **kwargs)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\pydantic\main.py", line 253, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for ChatOpenAI
+  Value error, Did not find openai_api_key, please add an environment variable `OPENAI_API_KEY` which contains it, or pass `openai_api_key` as a named parameter. [type=value_error, input_value={'model_name': 'gpt-4o-mi...ne, 'http_client': None}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.11/v/value_error
+2025-05-11 17:22:30,931 - main - INFO - Received shutdown signal 2
+2025-05-11 17:22:30,939 - main - INFO - Shutting down application...
+2025-05-11 17:22:39,488 - main - INFO - Ensured directory exists: ./storage
+2025-05-11 17:22:39,489 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-11 17:22:39,490 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-11 17:22:39,490 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-11 17:22:39,490 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-11 17:22:39,491 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-11 17:22:39,491 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-11 17:22:39,491 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-11 17:22:39,492 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-11 17:22:39,505 - main - INFO - Starting up application...
+2025-05-11 17:22:39,505 - main - INFO - Ensured directory exists: ./storage
+2025-05-11 17:22:39,505 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-11 17:22:39,505 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-11 17:22:39,506 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-11 17:22:39,506 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-11 17:22:39,507 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-11 17:22:39,507 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-11 17:22:39,508 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-11 17:22:39,508 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-11 17:23:18,028 - routers.chat - ERROR - Error in chat: The api_key client option must be set either by passing api_key to the client or by setting the GROQ_API_KEY environment variable
+Traceback (most recent call last):
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\routers\chat.py", line 147, in chat
+    tutor_agent = create_study_tutor_agent()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\agents.py", line 119, in create_study_tutor_agent
+    llm=get_llm(),
+        ^^^^^^^^^
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\agents.py", line 18, in get_llm
+    llm = ChatGroq(
+          ^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\langchain_core\load\serializable.py", line 130, in __init__
+    super().__init__(*args, **kwargs)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\pydantic\main.py", line 253, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\langchain_groq\chat_models.py", line 411, in validate_environment
+    self.client = groq.Groq(
+                  ^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\groq\_client.py", line 81, in __init__
+    raise GroqError(
+groq.GroqError: The api_key client option must be set either by passing api_key to the client or by setting the GROQ_API_KEY environment variable
+2025-05-11 17:23:48,821 - routers.chat - ERROR - Error in chat: The api_key client option must be set either by passing api_key to the client or by setting the GROQ_API_KEY environment variable
+Traceback (most recent call last):
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\routers\chat.py", line 147, in chat
+    tutor_agent = create_study_tutor_agent()
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\agents.py", line 119, in create_study_tutor_agent
+    llm=get_llm(),
+        ^^^^^^^^^
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\agents.py", line 18, in get_llm
+    llm = ChatGroq(
+          ^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\langchain_core\load\serializable.py", line 130, in __init__
+    super().__init__(*args, **kwargs)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\pydantic\main.py", line 253, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\langchain_groq\chat_models.py", line 411, in validate_environment
+    self.client = groq.Groq(
+                  ^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\groq\_client.py", line 81, in __init__
+    raise GroqError(
+groq.GroqError: The api_key client option must be set either by passing api_key to the client or by setting the GROQ_API_KEY environment variable
+2025-05-11 17:24:00,215 - main - INFO - Received shutdown signal 2
+2025-05-11 17:24:00,216 - main - INFO - Shutting down application...
+2025-05-11 17:24:08,237 - main - INFO - Ensured directory exists: ./storage
+2025-05-11 17:24:08,238 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-11 17:24:08,238 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-11 17:24:08,239 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-11 17:24:08,239 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-11 17:24:08,239 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-11 17:24:08,239 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-11 17:24:08,240 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-11 17:24:08,240 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-11 17:24:08,252 - main - INFO - Starting up application...
+2025-05-11 17:24:08,253 - main - INFO - Ensured directory exists: ./storage
+2025-05-11 17:24:08,253 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-11 17:24:08,254 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-11 17:24:08,254 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-11 17:24:08,254 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-11 17:24:08,254 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-11 17:24:08,255 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-11 17:24:08,255 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-11 17:24:08,255 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-11 17:24:23,025 - LiteLLM - DEBUG - 
+
+2025-05-11 17:24:23,025 - LiteLLM - DEBUG - [92mRequest to litellm:[0m
+2025-05-11 17:24:23,026 - LiteLLM - DEBUG - [92mlitellm.completion(model='groq/qwen-qwq-32b', messages=[{'role': 'system', 'content': "You are Study Tutor. You are an expert educator with years of experience breaking down difficult concepts \n        into understandable explanations. You excel at adapting your teaching style to match different \n        learning preferences and maintaining engaging conversations.\n        \n        Your key strengths include:\n        1. Breaking down complex topics into digestible pieces\n        2. Providing clear, concrete examples\n        3. Using analogies to connect new concepts with familiar ones\n        4. Maintaining context across a conversation\n        5. Identifying and addressing gaps in understanding\n        6. Encouraging critical thinking and deeper exploration\n        7. Adapting explanations based on the student's responses\n        8. Referencing source material effectively\n        \n        You aim to not just answer questions, but to ensure deep understanding and \n        help students build connections between different concepts.\nYour personal goal is: Explain complex concepts clearly and help students understand course material\nTo give my best complete final answer to the task respond using the exact following format:\n\nThought: I now can give a great answer\nFinal Answer: Your final answer must be the great and the most complete as possible, it must be outcome described.\n\nI MUST use these formats, my job depends on it!"}, {'role': 'user', 'content': '\nCurrent Task: Explain the following concept using clear, concise language. \n    Break down complex ideas into manageable parts. Use analogies where helpful.\n    \n    Question: hi\n    \n    Context information:\n    \n    \n    Guidelines:\n    1. Start with a direct, clear answer to the question - get straight to the point\n    2. Provide relevant examples from the context\n    3. Break down complex concepts into simpler parts\n    4. Use analogies or comparisons when helpful\n    5. Reference specific information from the document when relevant\n    6. If the question is unclear or lacks context, ask for clarification\n    7. If the context appears to be an index, table of contents, or references section rather than actual content, \n       explain that you need more specific questions about concepts, not just terms from the index\n    8. Always provide substantive educational value in your answers, not just listings or metadata\n    9. Never respond with raw index entries, reference lists, or page numbers\n    10. Focus on explaining the concept rather than reporting document metadata\n    \n        Important: The context information is limited or missing. Please:\n        1. Acknowledge the limited information available\n        2. Provide general information about the topic based on your knowledge\n        3. Explain what specific details from the document would help you give a more complete answer\n        4. Suggest alternative questions that might yield better results\n        \n\nThis is the expected criteria for your final answer: A clear, well-structured explanation that directly addresses the question while incorporating relevant context\nyou MUST return the actual complete content as the final answer, not a summary.\n\nBegin! This is VERY important to you, use the tools available and give your best Final Answer, your job depends on it!\n\nThought:'}], temperature=0.7, stop=['\nObservation:'], stream=False)[0m
+2025-05-11 17:24:23,026 - LiteLLM - DEBUG - 
+
+2025-05-11 17:24:23,027 - LiteLLM - DEBUG - Initialized litellm callbacks, Async Success Callbacks: [<crewai.utilities.token_counter_callback.TokenCalcHandler object at 0x000002CF75D8FC90>]
+2025-05-11 17:24:23,027 - LiteLLM - DEBUG - self.optional_params: {}
+2025-05-11 17:24:23,028 - LiteLLM - DEBUG - SYNC kwargs[caching]: False; litellm.cache: None; kwargs.get('cache')['no-cache']: False
+2025-05-11 17:24:23,032 - LiteLLM - INFO - 
+LiteLLM completion() model= qwen-qwq-32b; provider = groq
+2025-05-11 17:24:23,033 - LiteLLM - DEBUG - 
+LiteLLM: Params passed to completion() {'model': 'qwen-qwq-32b', 'functions': None, 'function_call': None, 'temperature': 0.7, 'top_p': None, 'n': None, 'stream': False, 'stream_options': None, 'stop': ['\nObservation:'], 'max_tokens': None, 'max_completion_tokens': None, 'modalities': None, 'prediction': None, 'audio': None, 'presence_penalty': None, 'frequency_penalty': None, 'logit_bias': None, 'user': None, 'custom_llm_provider': 'groq', 'response_format': None, 'seed': None, 'tools': None, 'tool_choice': None, 'max_retries': None, 'logprobs': None, 'top_logprobs': None, 'extra_headers': None, 'api_version': None, 'parallel_tool_calls': None, 'drop_params': None, 'allowed_openai_params': None, 'reasoning_effort': None, 'additional_drop_params': None, 'messages': [{'role': 'system', 'content': "You are Study Tutor. You are an expert educator with years of experience breaking down difficult concepts \n        into understandable explanations. You excel at adapting your teaching style to match different \n        learning preferences and maintaining engaging conversations.\n        \n        Your key strengths include:\n        1. Breaking down complex topics into digestible pieces\n        2. Providing clear, concrete examples\n        3. Using analogies to connect new concepts with familiar ones\n        4. Maintaining context across a conversation\n        5. Identifying and addressing gaps in understanding\n        6. Encouraging critical thinking and deeper exploration\n        7. Adapting explanations based on the student's responses\n        8. Referencing source material effectively\n        \n        You aim to not just answer questions, but to ensure deep understanding and \n        help students build connections between different concepts.\nYour personal goal is: Explain complex concepts clearly and help students understand course material\nTo give my best complete final answer to the task respond using the exact following format:\n\nThought: I now can give a great answer\nFinal Answer: Your final answer must be the great and the most complete as possible, it must be outcome described.\n\nI MUST use these formats, my job depends on it!"}, {'role': 'user', 'content': '\nCurrent Task: Explain the following concept using clear, concise language. \n    Break down complex ideas into manageable parts. Use analogies where helpful.\n    \n    Question: hi\n    \n    Context information:\n    \n    \n    Guidelines:\n    1. Start with a direct, clear answer to the question - get straight to the point\n    2. Provide relevant examples from the context\n    3. Break down complex concepts into simpler parts\n    4. Use analogies or comparisons when helpful\n    5. Reference specific information from the document when relevant\n    6. If the question is unclear or lacks context, ask for clarification\n    7. If the context appears to be an index, table of contents, or references section rather than actual content, \n       explain that you need more specific questions about concepts, not just terms from the index\n    8. Always provide substantive educational value in your answers, not just listings or metadata\n    9. Never respond with raw index entries, reference lists, or page numbers\n    10. Focus on explaining the concept rather than reporting document metadata\n    \n        Important: The context information is limited or missing. Please:\n        1. Acknowledge the limited information available\n        2. Provide general information about the topic based on your knowledge\n        3. Explain what specific details from the document would help you give a more complete answer\n        4. Suggest alternative questions that might yield better results\n        \n\nThis is the expected criteria for your final answer: A clear, well-structured explanation that directly addresses the question while incorporating relevant context\nyou MUST return the actual complete content as the final answer, not a summary.\n\nBegin! This is VERY important to you, use the tools available and give your best Final Answer, your job depends on it!\n\nThought:'}], 'thinking': None}
+2025-05-11 17:24:23,034 - LiteLLM - DEBUG - 
+LiteLLM: Non-Default params passed to completion() {'temperature': 0.7, 'stream': False, 'stop': ['\nObservation:']}
+2025-05-11 17:24:23,034 - LiteLLM - DEBUG - Final returned optional params: {'temperature': 0.7, 'stream': False, 'stop': ['\nObservation:'], 'extra_body': {}}
+2025-05-11 17:24:23,035 - LiteLLM - DEBUG - self.optional_params: {'temperature': 0.7, 'stream': False, 'stop': ['\nObservation:'], 'extra_body': {}}
+2025-05-11 17:24:23,036 - LiteLLM - DEBUG - [92m
+
+POST Request Sent from LiteLLM:
+curl -X POST \
+https://api.groq.com/openai/v1/chat/completions \
+-H 'Authorization: Be****DE' -H 'Content-Type: ap****on' \
+-d '{'model': 'qwen-qwq-32b', 'messages': [{'role': 'system', 'content': "You are Study Tutor. You are an expert educator with years of experience breaking down difficult concepts \n        into understandable explanations. You excel at adapting your teaching style to match different \n        learning preferences and maintaining engaging conversations.\n        \n        Your key strengths include:\n        1. Breaking down complex topics into digestible pieces\n        2. Providing clear, concrete examples\n        3. Using analogies to connect new concepts with familiar ones\n        4. Maintaining context across a conversation\n        5. Identifying and addressing gaps in understanding\n        6. Encouraging critical thinking and deeper exploration\n        7. Adapting explanations based on the student's responses\n        8. Referencing source material effectively\n        \n        You aim to not just answer questions, but to ensure deep understanding and \n        help students build connections between different concepts.\nYour personal goal is: Explain complex concepts clearly and help students understand course material\nTo give my best complete final answer to the task respond using the exact following format:\n\nThought: I now can give a great answer\nFinal Answer: Your final answer must be the great and the most complete as possible, it must be outcome described.\n\nI MUST use these formats, my job depends on it!"}, {'role': 'user', 'content': '\nCurrent Task: Explain the following concept using clear, concise language. \n    Break down complex ideas into manageable parts. Use analogies where helpful.\n    \n    Question: hi\n    \n    Context information:\n    \n    \n    Guidelines:\n    1. Start with a direct, clear answer to the question - get straight to the point\n    2. Provide relevant examples from the context\n    3. Break down complex concepts into simpler parts\n    4. Use analogies or comparisons when helpful\n    5. Reference specific information from the document when relevant\n    6. If the question is unclear or lacks context, ask for clarification\n    7. If the context appears to be an index, table of contents, or references section rather than actual content, \n       explain that you need more specific questions about concepts, not just terms from the index\n    8. Always provide substantive educational value in your answers, not just listings or metadata\n    9. Never respond with raw index entries, reference lists, or page numbers\n    10. Focus on explaining the concept rather than reporting document metadata\n    \n        Important: The context information is limited or missing. Please:\n        1. Acknowledge the limited information available\n        2. Provide general information about the topic based on your knowledge\n        3. Explain what specific details from the document would help you give a more complete answer\n        4. Suggest alternative questions that might yield better results\n        \n\nThis is the expected criteria for your final answer: A clear, well-structured explanation that directly addresses the question while incorporating relevant context\nyou MUST return the actual complete content as the final answer, not a summary.\n\nBegin! This is VERY important to you, use the tools available and give your best Final Answer, your job depends on it!\n\nThought:'}], 'temperature': 0.7, 'stream': False, 'stop': ['\nObservation:']}'
+[0m
+
+2025-05-11 17:24:23,287 - httpcore.connection - DEBUG - connect_tcp.started host='api.groq.com' port=443 local_address=None timeout=600.0 socket_options=None
+2025-05-11 17:24:23,326 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002CF75D8E5D0>
+2025-05-11 17:24:23,327 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x000002CF75DE3800> server_hostname='api.groq.com' timeout=600.0
+2025-05-11 17:24:23,349 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x000002CF75F43450>
+2025-05-11 17:24:23,350 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-05-11 17:24:23,350 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-11 17:24:23,351 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-05-11 17:24:23,351 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-11 17:24:23,351 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-05-11 17:24:25,233 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): telemetry.crewai.com:4319
+2025-05-11 17:24:25,364 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Sun, 11 May 2025 11:54:25 GMT'), (b'Content-Type', b'application/json'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Cache-Control', b'private, max-age=0, no-store, no-cache, must-revalidate'), (b'vary', b'Origin'), (b'x-groq-region', b'gcp-asia-south1'), (b'x-ratelimit-limit-requests', b'1000'), (b'x-ratelimit-limit-tokens', b'6000'), (b'x-ratelimit-remaining-requests', b'999'), (b'x-ratelimit-remaining-tokens', b'5187'), (b'x-ratelimit-reset-requests', b'1m26.4s'), (b'x-ratelimit-reset-tokens', b'8.13s'), (b'x-request-id', b'req_01jtzk4ft2f2pv5tsb43c3ke37'), (b'cf-cache-status', b'DYNAMIC'), (b'Set-Cookie', b'__cf_bm=p9SWrUAdIUQx9luCeAdIPE7pl24cPdOkOBXNSRQxXNQ-1746964465-1.0.1.1-1P9braAfUNjr9.nmADtteuEVKjrge6kffDhj4qr18azkEPyrm31p502aTxWqqWEAgT9bhvLNAlMRpzsp5Jwbttw33zPvJezVetHbqM5EZp4; path=/; expires=Sun, 11-May-25 12:24:25 GMT; domain=.groq.com; HttpOnly; Secure; SameSite=None'), (b'Server', b'cloudflare'), (b'CF-RAY', b'93e17b382aef545e-DEL'), (b'Content-Encoding', b'gzip'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-11 17:24:25,366 - httpx - INFO - HTTP Request: POST https://api.groq.com/openai/v1/chat/completions "HTTP/1.1 200 OK"
+2025-05-11 17:24:25,367 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-05-11 17:24:25,370 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-11 17:24:25,371 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-11 17:24:25,371 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-11 17:24:25,372 - LiteLLM - DEBUG - RAW RESPONSE:
+{"id": "chatcmpl-3fe7b86e-fa8b-4f82-a182-2d425d70d23e", "object": "chat.completion", "created": 1746964463, "model": "qwen-qwq-32b", "choices": [{"index": 0, "message": {"role": "assistant", "content": "\n<think>\nOkay, the user sent a \"hi\" as the question. That's pretty vague. Let me check the guidelines again. The context information is missing, so I need to handle that.\n\nFirst, I should acknowledge the limited info. Then provide a general response. Since the question is just \"hi\", maybe they're testing me or need help but didn't specify. \n\nThe guidelines say to explain the concept clearly, break it down, use analogies if possible. But since there's no actual question, I need to prompt them for more details. Wait, the user's instructions mention if the question is unclear or lacks context, I should ask for clarification. \n\nAlso, the context here is empty, so I should mention that. The task requires me to follow the specific format. Let me structure the response step by step as per the guidelines. \n\nStart with a direct answer. But the question is \"hi\", so the answer should be a greeting. Then follow up with an explanation that they need to provide more details. Break down the need for clarity, maybe use an analogy about a roadmap needing directions. \n\nI need to make sure I don't mention the document since there's no context. Suggest alternative questions they could ask. Keep it friendly but informative. Let me put it all together in the required format.\n</think>\n\nThought: I now can give a great answer  \nFinal Answer:  \n\n**Concept Explanation:**  \nYour question appears to be a greeting (\"hi\"), which is a common way to start a conversation. Since there\u2019s no specific concept or topic provided, I\u2019ll address how to approach learning or explaining ideas effectively. Let\u2019s break this down:  \n\n1. **Clarity First**: Always state the core idea upfront. For example, if explaining photosynthesis, start with, *\"Photosynthesis is how plants convert sunlight into energy.\"*  \n2. **Break Down Complexity**: Split concepts into parts. Using the same example:  \n   - Part 1: Sunlight absorption (leaves capture light)  \n   - Part 2: Chemical process (CO\u2082 + water \u2192 glucose)  \n   - Part 3: Output (oxygen release)  \n3. **Analogies**: Compare new ideas to familiar ones. *\u201cPhotosynthesis is like a kitchen where sunlight is the stove, CO\u2082 is flour, and glucose is the baked bread.\u201d*  \n\n**Why This Matters**: Without a specific topic, it\u2019s hard to provide tailored help. For instance, if you asked, *\u201cHow does photosynthesis work?\u201d*, I could link it to real-world examples like plant growth or oxygen production.  \n\n**What I Need**:  \n- A specific question (e.g., *\"Explain quantum entanglement,\"* *\"How does climate change affect ecosystems?\"*).  \n- Context from your course material (e.g., chapter titles, key terms, or themes).  \n\n**Next Steps**:  \nAsk about a *specific concept*, and I\u2019ll apply the breakdown + analogy method to clarify it. For example:  \n- *\"I\u2019m confused about [topic] in Chapter 3. Can you explain [specific concept]?\"*  \n\nThis structure ensures you get a focused, actionable explanation! Let me know what you need to learn. \ud83d\ude0a"}, "logprobs": null, "finish_reason": "stop"}], "usage": {"queue_time": 0.254428433, "prompt_tokens": 638, "prompt_time": 0.065031247, "completion_tokens": 661, "completion_time": 1.606891079, "total_tokens": 1299, "total_time": 1.671922326}, "usage_breakdown": {"models": null}, "system_fingerprint": "fp_3796682456", "x_groq": {"id": "req_01jtzk4ft2f2pv5tsb43c3ke37"}}
+
+
+2025-05-11 17:24:25,374 - LiteLLM - INFO - Wrapper: Completed Call, calling success_handler
+2025-05-11 17:24:25,374 - LiteLLM - DEBUG - Logging Details LiteLLM-Success Call: Cache_hit=None
+2025-05-11 17:24:25,375 - LiteLLM - INFO - selected model name for cost calculation: groq/qwen-qwq-32b
+2025-05-11 17:24:25,375 - LiteLLM - INFO - selected model name for cost calculation: groq/qwen-qwq-32b
+2025-05-11 17:24:25,376 - LiteLLM - DEBUG - checking potential_model_names in litellm.model_cost: {'split_model': 'qwen-qwq-32b', 'combined_model_name': 'groq/qwen-qwq-32b', 'stripped_model_name': 'qwen-qwq-32b', 'combined_stripped_model_name': 'groq/qwen-qwq-32b', 'custom_llm_provider': 'groq'}
+2025-05-11 17:24:25,377 - LiteLLM - DEBUG - checking potential_model_names in litellm.model_cost: {'split_model': 'qwen-qwq-32b', 'combined_model_name': 'groq/qwen-qwq-32b', 'stripped_model_name': 'qwen-qwq-32b', 'combined_stripped_model_name': 'groq/qwen-qwq-32b', 'custom_llm_provider': 'groq'}
+2025-05-11 17:24:25,377 - LiteLLM - DEBUG - Error getting model info: This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json
+2025-05-11 17:24:25,378 - LiteLLM - DEBUG - Error getting model info: This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json
+2025-05-11 17:24:25,378 - LiteLLM - DEBUG - litellm.cost_calculator.py::completion_cost() - Error calculating cost for model=groq/qwen-qwq-32b - This model isn't mapped yet. model=groq/qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.
+2025-05-11 17:24:25,378 - LiteLLM - DEBUG - litellm.cost_calculator.py::completion_cost() - Error calculating cost for model=groq/qwen-qwq-32b - This model isn't mapped yet. model=groq/qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.
+2025-05-11 17:24:25,379 - LiteLLM - INFO - selected model name for cost calculation: groq/qwen-qwq-32b
+2025-05-11 17:24:25,379 - LiteLLM - INFO - selected model name for cost calculation: qwen-qwq-32b
+2025-05-11 17:24:25,379 - LiteLLM - DEBUG - checking potential_model_names in litellm.model_cost: {'split_model': 'qwen-qwq-32b', 'combined_model_name': 'groq/qwen-qwq-32b', 'stripped_model_name': 'qwen-qwq-32b', 'combined_stripped_model_name': 'groq/qwen-qwq-32b', 'custom_llm_provider': 'groq'}
+2025-05-11 17:24:25,380 - LiteLLM - DEBUG - checking potential_model_names in litellm.model_cost: {'split_model': 'qwen-qwq-32b', 'combined_model_name': 'groq/qwen-qwq-32b', 'stripped_model_name': 'qwen-qwq-32b', 'combined_stripped_model_name': 'groq/qwen-qwq-32b', 'custom_llm_provider': 'groq'}
+2025-05-11 17:24:25,380 - LiteLLM - DEBUG - Error getting model info: This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json
+2025-05-11 17:24:25,380 - LiteLLM - DEBUG - Error getting model info: This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json
+2025-05-11 17:24:25,381 - LiteLLM - DEBUG - litellm.cost_calculator.py::completion_cost() - Error calculating cost for model=groq/qwen-qwq-32b - This model isn't mapped yet. model=groq/qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.
+2025-05-11 17:24:25,381 - LiteLLM - DEBUG - litellm.cost_calculator.py::completion_cost() - Error calculating cost for model=qwen-qwq-32b - This model isn't mapped yet. model=qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.
+2025-05-11 17:24:25,390 - LiteLLM - DEBUG - response_cost_failure_debug_information: {'error_str': "This model isn't mapped yet. model=qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.", 'traceback_str': 'Traceback (most recent call last):\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\utils.py", line 4241, in _get_model_info_helper\n    raise ValueError(\nValueError: This model isn\'t mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\litellm_core_utils\\litellm_logging.py", line 1092, in _response_cost_calculator\n    response_cost = litellm.response_cost_calculator(\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 1030, in response_cost_calculator\n    raise e\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 1015, in response_cost_calculator\n    response_cost = completion_cost(\n                    ^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 931, in completion_cost\n    raise e\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 924, in completion_cost\n    raise e\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 887, in completion_cost\n    ) = cost_per_token(\n        ^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 333, in cost_per_token\n    model_info = _cached_get_model_info_helper(\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\utils.py", line 4108, in _cached_get_model_info_helper\n    return _get_model_info_helper(model=model, custom_llm_provider=custom_llm_provider)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\utils.py", line 4365, in _get_model_info_helper\n    raise Exception(\nException: This model isn\'t mapped yet. model=qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.\n', 'model': 'qwen-qwq-32b', 'cache_hit': None, 'custom_llm_provider': 'groq', 'base_model': None, 'call_type': 'completion', 'custom_pricing': False}
+2025-05-11 17:24:25,391 - LiteLLM - DEBUG - response_cost_failure_debug_information: {'error_str': "This model isn't mapped yet. model=groq/qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.", 'traceback_str': 'Traceback (most recent call last):\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\utils.py", line 4241, in _get_model_info_helper\n    raise ValueError(\nValueError: This model isn\'t mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\litellm_core_utils\\litellm_logging.py", line 1092, in _response_cost_calculator\n    response_cost = litellm.response_cost_calculator(\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 1030, in response_cost_calculator\n    raise e\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 1015, in response_cost_calculator\n    response_cost = completion_cost(\n                    ^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 931, in completion_cost\n    raise e\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 924, in completion_cost\n    raise e\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 887, in completion_cost\n    ) = cost_per_token(\n        ^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 333, in cost_per_token\n    model_info = _cached_get_model_info_helper(\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\utils.py", line 4108, in _cached_get_model_info_helper\n    return _get_model_info_helper(model=model, custom_llm_provider=custom_llm_provider)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\utils.py", line 4365, in _get_model_info_helper\n    raise Exception(\nException: This model isn\'t mapped yet. model=groq/qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.\n', 'model': 'groq/qwen-qwq-32b', 'cache_hit': False, 'custom_llm_provider': 'groq', 'base_model': None, 'call_type': 'completion', 'custom_pricing': False}
+2025-05-11 17:24:25,393 - LiteLLM - DEBUG - checking potential_model_names in litellm.model_cost: {'split_model': 'qwen-qwq-32b', 'combined_model_name': 'groq/qwen-qwq-32b', 'stripped_model_name': 'qwen-qwq-32b', 'combined_stripped_model_name': 'groq/qwen-qwq-32b', 'custom_llm_provider': 'groq'}
+2025-05-11 17:24:25,395 - LiteLLM - DEBUG - Error getting model info: This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json
+2025-05-11 17:24:25,396 - LiteLLM - DEBUG - Model=qwen-qwq-32b is not mapped in model cost map. Defaulting to None model_cost_information for standard_logging_payload
+2025-05-11 17:24:25,400 - LiteLLM - DEBUG - Logging Details LiteLLM-Success Call streaming complete
+2025-05-11 17:24:25,401 - LiteLLM - INFO - selected model name for cost calculation: groq/qwen-qwq-32b
+2025-05-11 17:24:25,401 - LiteLLM - DEBUG - checking potential_model_names in litellm.model_cost: {'split_model': 'qwen-qwq-32b', 'combined_model_name': 'groq/qwen-qwq-32b', 'stripped_model_name': 'qwen-qwq-32b', 'combined_stripped_model_name': 'groq/qwen-qwq-32b', 'custom_llm_provider': 'groq'}
+2025-05-11 17:24:25,402 - LiteLLM - DEBUG - Error getting model info: This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json
+2025-05-11 17:24:25,403 - LiteLLM - DEBUG - litellm.cost_calculator.py::completion_cost() - Error calculating cost for model=groq/qwen-qwq-32b - This model isn't mapped yet. model=groq/qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.
+2025-05-11 17:24:25,404 - LiteLLM - INFO - selected model name for cost calculation: qwen-qwq-32b
+2025-05-11 17:24:25,404 - LiteLLM - DEBUG - checking potential_model_names in litellm.model_cost: {'split_model': 'qwen-qwq-32b', 'combined_model_name': 'groq/qwen-qwq-32b', 'stripped_model_name': 'qwen-qwq-32b', 'combined_stripped_model_name': 'groq/qwen-qwq-32b', 'custom_llm_provider': 'groq'}
+2025-05-11 17:24:25,406 - LiteLLM - DEBUG - Error getting model info: This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json
+2025-05-11 17:24:25,407 - LiteLLM - DEBUG - litellm.cost_calculator.py::completion_cost() - Error calculating cost for model=qwen-qwq-32b - This model isn't mapped yet. model=qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.
+2025-05-11 17:24:25,408 - LiteLLM - DEBUG - response_cost_failure_debug_information: {'error_str': "This model isn't mapped yet. model=qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.", 'traceback_str': 'Traceback (most recent call last):\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\utils.py", line 4241, in _get_model_info_helper\n    raise ValueError(\nValueError: This model isn\'t mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\litellm_core_utils\\litellm_logging.py", line 1092, in _response_cost_calculator\n    response_cost = litellm.response_cost_calculator(\n                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 1030, in response_cost_calculator\n    raise e\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 1015, in response_cost_calculator\n    response_cost = completion_cost(\n                    ^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 931, in completion_cost\n    raise e\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 924, in completion_cost\n    raise e\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 887, in completion_cost\n    ) = cost_per_token(\n        ^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\cost_calculator.py", line 333, in cost_per_token\n    model_info = _cached_get_model_info_helper(\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\utils.py", line 4108, in _cached_get_model_info_helper\n    return _get_model_info_helper(model=model, custom_llm_provider=custom_llm_provider)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "C:\\Users\\revan\\.conda\\envs\\interview_buddy_env\\Lib\\site-packages\\litellm\\utils.py", line 4365, in _get_model_info_helper\n    raise Exception(\nException: This model isn\'t mapped yet. model=qwen-qwq-32b, custom_llm_provider=groq. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json.\n', 'model': 'qwen-qwq-32b', 'cache_hit': None, 'custom_llm_provider': 'groq', 'base_model': None, 'call_type': 'completion', 'custom_pricing': False}
+2025-05-11 17:24:25,409 - LiteLLM - DEBUG - checking potential_model_names in litellm.model_cost: {'split_model': 'qwen-qwq-32b', 'combined_model_name': 'groq/qwen-qwq-32b', 'stripped_model_name': 'qwen-qwq-32b', 'combined_stripped_model_name': 'groq/qwen-qwq-32b', 'custom_llm_provider': 'groq'}
+2025-05-11 17:24:25,410 - LiteLLM - DEBUG - Error getting model info: This model isn't mapped yet. Add it here - https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json
+2025-05-11 17:24:25,410 - LiteLLM - DEBUG - Model=qwen-qwq-32b is not mapped in model cost map. Defaulting to None model_cost_information for standard_logging_payload
+2025-05-11 17:24:26,145 - urllib3.connectionpool - DEBUG - https://telemetry.crewai.com:4319 "POST /v1/traces HTTP/1.1" 200 2
+2025-05-12 14:02:16,500 - main - INFO - Ensured directory exists: ./storage
+2025-05-12 14:02:16,500 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-12 14:02:16,500 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-12 14:02:16,500 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-12 14:02:16,500 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-12 14:02:16,500 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-12 14:02:16,500 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-12 14:02:16,500 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-12 14:02:16,500 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-12 14:02:16,527 - main - INFO - Starting up application...
+2025-05-12 14:02:16,527 - main - INFO - Ensured directory exists: ./storage
+2025-05-12 14:02:16,527 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-12 14:02:16,527 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-12 14:02:16,527 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-12 14:02:16,527 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-12 14:02:16,527 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-12 14:02:16,527 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-12 14:02:16,532 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-12 14:02:16,533 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-12 14:03:39,494 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:03:39,517 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713D68190>
+2025-05-12 14:03:39,518 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020712C75C70> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:03:39,537 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713D160D0>
+2025-05-12 14:03:39,538 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 14:03:39,539 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:03:39,539 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 14:03:39,540 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:03:39,540 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 14:03:41,021 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 08:33:41 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'0-0/*'), (b'CF-Ray', b'93e89290d9858ae8-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'70'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:03:41,023 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 14:03:41,024 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 14:03:41,026 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:03:41,027 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:03:41,027 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:03:41,029 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:03:41,029 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:03:41,032 - main - ERROR - Unhandled error in GET /api/forum/posts
+Traceback (most recent call last):
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 148, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\anyio\streams\memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\main.py", line 213, in error_handling_middleware
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 154, in call_next
+    raise app_exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\fastapi\routing.py", line 327, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\fastapi\routing.py", line 176, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 2 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'id'), 'msg': 'Input should be a valid string', 'input': 200031}
+  {'type': 'list_type', 'loc': ('response', 0, 'tags'), 'msg': 'Input should be a valid list', 'input': 'test'}
+
+2025-05-12 14:03:41,332 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:03:41,355 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E3BF90>
+2025-05-12 14:03:41,356 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020712C756D0> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:03:41,372 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000207650F9FD0>
+2025-05-12 14:03:41,373 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 14:03:41,373 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:03:41,373 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 14:03:41,374 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:03:41,374 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 14:03:42,124 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 08:33:42 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'0-0/*'), (b'CF-Ray', b'93e8929c5f4354d8-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'5'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:03:42,125 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 14:03:42,126 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 14:03:42,128 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:03:42,128 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:03:42,129 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:03:42,129 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:03:42,131 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:03:42,131 - main - ERROR - Unhandled error in GET /api/forum/posts
+Traceback (most recent call last):
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 148, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\anyio\streams\memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\main.py", line 213, in error_handling_middleware
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 154, in call_next
+    raise app_exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\fastapi\routing.py", line 327, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\fastapi\routing.py", line 176, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 2 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'id'), 'msg': 'Input should be a valid string', 'input': 200031}
+  {'type': 'list_type', 'loc': ('response', 0, 'tags'), 'msg': 'Input should be a valid list', 'input': 'test'}
+
+2025-05-12 14:03:42,371 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:03:42,381 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713D30990>
+2025-05-12 14:03:42,381 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020712C76060> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:03:42,394 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713DC6190>
+2025-05-12 14:03:42,395 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 14:03:42,395 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:03:42,396 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 14:03:42,396 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:03:42,396 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 14:03:43,142 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 08:33:43 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'0-0/*'), (b'CF-Ray', b'93e892a2b8525506-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'4'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:03:43,143 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 14:03:43,144 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 14:03:43,145 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:03:43,146 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:03:43,147 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:03:43,148 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:03:43,148 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:03:43,149 - main - ERROR - Unhandled error in GET /api/forum/posts
+Traceback (most recent call last):
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 148, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\anyio\streams\memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\main.py", line 213, in error_handling_middleware
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 154, in call_next
+    raise app_exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\fastapi\routing.py", line 327, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\fastapi\routing.py", line 176, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 2 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'id'), 'msg': 'Input should be a valid string', 'input': 200031}
+  {'type': 'list_type', 'loc': ('response', 0, 'tags'), 'msg': 'Input should be a valid list', 'input': 'test'}
+
+2025-05-12 14:06:03,673 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:06:03,692 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E6E450>
+2025-05-12 14:06:03,692 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020712C760F0> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:06:03,714 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E6E390>
+2025-05-12 14:06:03,715 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 14:06:03,717 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:06:03,717 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 14:06:03,718 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:06:03,718 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 14:06:04,302 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 08:36:04 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'0-0/*'), (b'CF-Ray', b'93e89615fffc5469-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'16'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:06:04,303 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 14:06:04,304 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 14:06:04,305 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:06:04,305 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:06:04,306 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:06:04,306 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:06:04,307 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:06:04,307 - main - ERROR - Unhandled error in GET /api/forum/posts
+Traceback (most recent call last):
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 148, in call_next
+    message = await recv_stream.receive()
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\anyio\streams\memory.py", line 126, in receive
+    raise EndOfStream from None
+anyio.EndOfStream
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\revan\Documents\Projects\Inteview_Buddy\backend\main.py", line 213, in error_handling_middleware
+    return await call_next(request)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 154, in call_next
+    raise app_exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\base.py", line 141, in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\cors.py", line 93, in __call__
+    await self.simple_response(scope, receive, send, request_headers=headers)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\cors.py", line 144, in simple_response
+    await self.app(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\middleware\exceptions.py", line 62, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 715, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 735, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 288, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 76, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\starlette\routing.py", line 73, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\fastapi\routing.py", line 327, in app
+    content = await serialize_response(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\revan\.conda\envs\interview_buddy_env\Lib\site-packages\fastapi\routing.py", line 176, in serialize_response
+    raise ResponseValidationError(
+fastapi.exceptions.ResponseValidationError: 2 validation errors:
+  {'type': 'string_type', 'loc': ('response', 0, 'id'), 'msg': 'Input should be a valid string', 'input': 200031}
+  {'type': 'list_type', 'loc': ('response', 0, 'tags'), 'msg': 'Input should be a valid list', 'input': 'test'}
+
+2025-05-12 14:12:31,137 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:12:31,703 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E6E350>
+2025-05-12 14:12:31,704 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020713E58440> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:12:32,274 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E6E990>
+2025-05-12 14:12:32,274 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 14:12:32,275 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:12:32,276 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 14:12:32,276 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:12:32,276 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 14:12:33,921 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 08:42:33 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'*/*'), (b'CF-Ray', b'93e89f92ff4d59a8-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'16'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:12:33,922 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 14:12:33,923 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 14:12:33,925 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:12:33,926 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:12:33,926 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:12:33,927 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:12:33,927 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:13:30,630 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:13:30,631 - httpcore.connection - DEBUG - connect_tcp.failed exception=ConnectError(gaierror(11001, 'getaddrinfo failed'))
+2025-05-12 14:13:43,017 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:13:43,255 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713DC7890>
+2025-05-12 14:13:43,257 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020712C75B50> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:13:43,494 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713CCD310>
+2025-05-12 14:13:43,495 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 14:13:43,496 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:13:43,496 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 14:13:43,496 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:13:43,496 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 14:13:44,040 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 08:43:44 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'*/*'), (b'CF-Ray', b'93e8a14f9e495958-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'17'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:13:44,041 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 14:13:44,042 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 14:13:44,043 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:13:44,043 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:13:44,044 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:13:44,044 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:13:44,045 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:14:18,231 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:14:18,247 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713DC57D0>
+2025-05-12 14:14:18,247 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020713E588C0> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:14:18,264 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E6EA90>
+2025-05-12 14:14:18,265 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-05-12 14:14:18,266 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:14:18,267 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-05-12 14:14:18,267 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:14:18,268 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-05-12 14:14:19,744 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 400, b'Bad Request', [(b'Date', b'Mon, 12 May 2025 08:44:20 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'CF-Ray', b'93e8a228f8175514-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'30'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:14:19,745 - httpx - INFO - HTTP Request: POST https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts "HTTP/1.1 400 Bad Request"
+2025-05-12 14:14:19,746 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-05-12 14:14:19,747 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:14:19,747 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:14:19,748 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:14:19,748 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:14:19,749 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:16:56,134 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:16:56,159 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000207650D7810>
+2025-05-12 14:16:56,160 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020713E58560> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:16:56,216 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713D681D0>
+2025-05-12 14:16:56,217 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-05-12 14:16:56,217 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:16:56,218 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-05-12 14:16:56,219 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:16:56,219 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-05-12 14:16:57,665 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 400, b'Bad Request', [(b'Date', b'Mon, 12 May 2025 08:46:58 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'CF-Ray', b'93e8a6043a6d9198-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'18'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:16:57,666 - httpx - INFO - HTTP Request: POST https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts "HTTP/1.1 400 Bad Request"
+2025-05-12 14:16:57,667 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-05-12 14:16:57,668 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:16:57,669 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:16:57,669 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:16:57,670 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:16:57,670 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:26:29,708 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:26:29,743 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713DB81D0>
+2025-05-12 14:26:29,744 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020712C756D0> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:26:29,765 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E7F5D0>
+2025-05-12 14:26:29,765 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 14:26:29,766 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:26:29,766 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 14:26:29,767 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:26:29,767 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 14:26:30,899 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 404, b'Not Found', [(b'Date', b'Mon, 12 May 2025 08:56:31 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'CF-Ray', b'93e8b404da115489-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'15'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:26:30,900 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 404 Not Found"
+2025-05-12 14:26:30,901 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 14:26:30,901 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:26:30,903 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:26:30,903 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:26:30,904 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:26:30,904 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:26:31,141 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:26:31,152 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713DC7190>
+2025-05-12 14:26:31,153 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020713E584D0> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:26:31,194 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713DC4E50>
+2025-05-12 14:26:31,195 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 14:26:31,195 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:26:31,196 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 14:26:31,196 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:26:31,196 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 14:26:31,487 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 404, b'Not Found', [(b'Date', b'Mon, 12 May 2025 08:56:31 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'CF-Ray', b'93e8b40dcff2595f-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'2'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:26:31,488 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 404 Not Found"
+2025-05-12 14:26:31,488 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 14:26:31,488 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:26:31,489 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:26:31,489 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:26:31,490 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:26:31,490 - httpcore.connection - DEBUG - close.complete
+2025-05-12 14:28:42,638 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 14:28:42,668 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713DC4D50>
+2025-05-12 14:28:42,668 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020713E58680> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 14:28:42,755 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E3B510>
+2025-05-12 14:28:42,756 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 14:28:42,757 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 14:28:42,757 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 14:28:42,757 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 14:28:42,757 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 14:28:44,138 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 404, b'Not Found', [(b'Date', b'Mon, 12 May 2025 08:58:44 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'CF-Ray', b'93e8b7441af354ea-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'17'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 14:28:44,139 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 404 Not Found"
+2025-05-12 14:28:44,139 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 14:28:44,144 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 14:28:44,144 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 14:28:44,144 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 14:28:44,144 - httpcore.connection - DEBUG - close.started
+2025-05-12 14:28:44,145 - httpcore.connection - DEBUG - close.complete
+2025-05-12 15:04:34,546 - httpcore.connection - DEBUG - connect_tcp.started host='lyabbsgvlvsuhfpuxavx.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 15:04:34,598 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E7B4D0>
+2025-05-12 15:04:34,601 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000020713E58950> server_hostname='lyabbsgvlvsuhfpuxavx.supabase.co' timeout=5.0
+2025-05-12 15:04:34,619 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000020713E3AC90>
+2025-05-12 15:04:34,621 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 15:04:34,621 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 15:04:34,621 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 15:04:34,622 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 15:04:34,622 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 15:04:36,350 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 404, b'Not Found', [(b'Date', b'Mon, 12 May 2025 09:34:36 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'CF-Ray', b'93e8ebcd6d975496-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lyabbsgvlvsuhfpuxavx'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'205'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 15:04:36,351 - httpx - INFO - HTTP Request: GET https://lyabbsgvlvsuhfpuxavx.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 404 Not Found"
+2025-05-12 15:04:36,351 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 15:04:36,357 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 15:04:36,357 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 15:04:36,357 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 15:04:36,358 - httpcore.connection - DEBUG - close.started
+2025-05-12 15:04:36,358 - httpcore.connection - DEBUG - close.complete
+2025-05-12 17:55:37,928 - main - INFO - Received shutdown signal 2
+2025-05-12 17:55:37,928 - main - INFO - Shutting down application...
+2025-05-12 17:55:46,826 - main - INFO - Ensured directory exists: ./storage
+2025-05-12 17:55:46,826 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-12 17:55:46,826 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-12 17:55:46,826 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-12 17:55:46,826 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-12 17:55:46,826 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-12 17:55:46,826 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-12 17:55:46,826 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-12 17:55:46,826 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-12 17:55:46,843 - main - INFO - Starting up application...
+2025-05-12 17:55:46,846 - main - INFO - Ensured directory exists: ./storage
+2025-05-12 17:55:46,846 - main - INFO - Ensured directory exists: ./storage/documents
+2025-05-12 17:55:46,846 - main - INFO - Ensured directory exists: ./storage/vectorstores
+2025-05-12 17:55:46,846 - main - INFO - Ensured directory exists: ./storage/cache
+2025-05-12 17:55:46,846 - main - INFO - Ensured directory exists: ./storage/notes
+2025-05-12 17:55:46,846 - main - INFO - Ensured directory exists: ./storage/flashcards
+2025-05-12 17:55:46,846 - main - INFO - Ensured directory exists: ./storage/tests
+2025-05-12 17:55:46,846 - main - INFO - Ensured directory exists: ./storage/mindmaps
+2025-05-12 17:55:46,849 - main - INFO - Ensured directory exists: ./storage/roadmaps
+2025-05-12 17:56:07,844 - httpcore.connection - DEBUG - connect_tcp.started host='lsctoaytabnkpgrfjwaw.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 17:56:07,932 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000220667C93D0>
+2025-05-12 17:56:07,933 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022065755C70> server_hostname='lsctoaytabnkpgrfjwaw.supabase.co' timeout=5.0
+2025-05-12 17:56:07,954 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x000002206683AE90>
+2025-05-12 17:56:07,955 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 17:56:07,955 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 17:56:07,955 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 17:56:07,956 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 17:56:07,956 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 17:56:08,535 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 12:26:09 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'*/*'), (b'CF-Ray', b'93e9e71b6aee596c-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lsctoaytabnkpgrfjwaw'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'80'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 17:56:08,535 - httpx - INFO - HTTP Request: GET https://lsctoaytabnkpgrfjwaw.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 17:56:08,536 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 17:56:08,536 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 17:56:08,536 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 17:56:08,537 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 17:56:08,538 - httpcore.connection - DEBUG - close.started
+2025-05-12 17:56:08,538 - httpcore.connection - DEBUG - close.complete
+2025-05-12 18:03:27,156 - httpcore.connection - DEBUG - connect_tcp.started host='lsctoaytabnkpgrfjwaw.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 18:03:27,184 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022066760750>
+2025-05-12 18:03:27,184 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022065755B50> server_hostname='lsctoaytabnkpgrfjwaw.supabase.co' timeout=5.0
+2025-05-12 18:03:27,207 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000220667D5750>
+2025-05-12 18:03:27,208 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'POST']>
+2025-05-12 18:03:27,209 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 18:03:27,209 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'POST']>
+2025-05-12 18:03:27,209 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 18:03:27,209 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'POST']>
+2025-05-12 18:03:27,940 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 201, b'Created', [(b'Date', b'Mon, 12 May 2025 12:33:28 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'*/*'), (b'CF-Ray', b'93e9f1d4be38594e-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'preference-applied', b'return=representation'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lsctoaytabnkpgrfjwaw'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'23'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 18:03:27,941 - httpx - INFO - HTTP Request: POST https://lsctoaytabnkpgrfjwaw.supabase.co/rest/v1/posts "HTTP/1.1 201 Created"
+2025-05-12 18:03:27,942 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'POST']>
+2025-05-12 18:03:27,948 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 18:03:27,949 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 18:03:27,950 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 18:03:27,951 - httpcore.connection - DEBUG - close.started
+2025-05-12 18:03:27,952 - httpcore.connection - DEBUG - close.complete
+2025-05-12 18:03:29,040 - httpcore.connection - DEBUG - connect_tcp.started host='lsctoaytabnkpgrfjwaw.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 18:03:29,076 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000220668A9A90>
+2025-05-12 18:03:29,076 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022065756840> server_hostname='lsctoaytabnkpgrfjwaw.supabase.co' timeout=5.0
+2025-05-12 18:03:29,102 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000220668AB710>
+2025-05-12 18:03:29,104 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 18:03:29,105 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 18:03:29,105 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 18:03:29,105 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 18:03:29,106 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 18:03:29,248 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 12:33:29 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'0-0/*'), (b'CF-Ray', b'93e9f1e09de49192-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lsctoaytabnkpgrfjwaw'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'4'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 18:03:29,250 - httpx - INFO - HTTP Request: GET https://lsctoaytabnkpgrfjwaw.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 18:03:29,250 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 18:03:29,251 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 18:03:29,251 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 18:03:29,251 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 18:03:29,252 - httpcore.connection - DEBUG - close.started
+2025-05-12 18:03:29,252 - httpcore.connection - DEBUG - close.complete
+2025-05-12 18:03:29,515 - httpcore.connection - DEBUG - connect_tcp.started host='lsctoaytabnkpgrfjwaw.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 18:03:29,537 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000220668B1790>
+2025-05-12 18:03:29,537 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022065756DE0> server_hostname='lsctoaytabnkpgrfjwaw.supabase.co' timeout=5.0
+2025-05-12 18:03:31,177 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000220668B16D0>
+2025-05-12 18:03:31,179 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 18:03:31,180 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 18:03:31,180 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 18:03:31,181 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 18:03:31,181 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 18:03:31,243 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 12:33:31 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'0-0/*'), (b'CF-Ray', b'93e9f1ed8df4595e-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lsctoaytabnkpgrfjwaw'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'3'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 18:03:31,244 - httpx - INFO - HTTP Request: GET https://lsctoaytabnkpgrfjwaw.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 18:03:31,244 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 18:03:31,244 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 18:03:31,245 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 18:03:31,246 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 18:03:31,246 - httpcore.connection - DEBUG - close.started
+2025-05-12 18:03:31,246 - httpcore.connection - DEBUG - close.complete
+2025-05-12 18:05:00,306 - httpcore.connection - DEBUG - connect_tcp.started host='lsctoaytabnkpgrfjwaw.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 18:05:00,318 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000220668B3E90>
+2025-05-12 18:05:00,318 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x00000220657570B0> server_hostname='lsctoaytabnkpgrfjwaw.supabase.co' timeout=5.0
+2025-05-12 18:05:00,338 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000220667A8510>
+2025-05-12 18:05:00,338 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 18:05:00,340 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 18:05:00,341 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 18:05:00,341 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 18:05:00,342 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 18:05:00,471 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 12:35:01 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'0-0/*'), (b'CF-Ray', b'93e9f41adb8a8ae5-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lsctoaytabnkpgrfjwaw'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'18'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 18:05:00,472 - httpx - INFO - HTTP Request: GET https://lsctoaytabnkpgrfjwaw.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 18:05:00,473 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 18:05:00,474 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 18:05:00,475 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 18:05:00,475 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 18:05:00,476 - httpcore.connection - DEBUG - close.started
+2025-05-12 18:05:00,477 - httpcore.connection - DEBUG - close.complete
+2025-05-12 18:05:00,723 - httpcore.connection - DEBUG - connect_tcp.started host='lsctoaytabnkpgrfjwaw.supabase.co' port=443 local_address=None timeout=5.0 socket_options=None
+2025-05-12 18:05:00,736 - httpcore.connection - DEBUG - connect_tcp.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x0000022066880190>
+2025-05-12 18:05:00,736 - httpcore.connection - DEBUG - start_tls.started ssl_context=<ssl.SSLContext object at 0x0000022065756F90> server_hostname='lsctoaytabnkpgrfjwaw.supabase.co' timeout=5.0
+2025-05-12 18:05:00,760 - httpcore.connection - DEBUG - start_tls.complete return_value=<httpcore._backends.anyio.AnyIOStream object at 0x00000220668B1F50>
+2025-05-12 18:05:00,760 - httpcore.http11 - DEBUG - send_request_headers.started request=<Request [b'GET']>
+2025-05-12 18:05:00,761 - httpcore.http11 - DEBUG - send_request_headers.complete
+2025-05-12 18:05:00,761 - httpcore.http11 - DEBUG - send_request_body.started request=<Request [b'GET']>
+2025-05-12 18:05:00,762 - httpcore.http11 - DEBUG - send_request_body.complete
+2025-05-12 18:05:00,762 - httpcore.http11 - DEBUG - receive_response_headers.started request=<Request [b'GET']>
+2025-05-12 18:05:00,894 - httpcore.http11 - DEBUG - receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'Date', b'Mon, 12 May 2025 12:35:01 GMT'), (b'Content-Type', b'application/json; charset=utf-8'), (b'Transfer-Encoding', b'chunked'), (b'Connection', b'keep-alive'), (b'Content-Range', b'0-0/*'), (b'CF-Ray', b'93e9f41d7a3359a2-DEL'), (b'CF-Cache-Status', b'DYNAMIC'), (b'Content-Encoding', b'gzip'), (b'Content-Location', b'/posts?order=created_at.desc&select=%2A'), (b'Strict-Transport-Security', b'max-age=31536000; includeSubDomains; preload'), (b'Vary', b'Accept-Encoding'), (b'content-profile', b'public'), (b'sb-gateway-version', b'1'), (b'sb-project-ref', b'lsctoaytabnkpgrfjwaw'), (b'X-Content-Type-Options', b'nosniff'), (b'x-envoy-attempt-count', b'1'), (b'x-envoy-upstream-service-time', b'4'), (b'Server', b'cloudflare'), (b'alt-svc', b'h3=":443"; ma=86400')])
+2025-05-12 18:05:00,895 - httpx - INFO - HTTP Request: GET https://lsctoaytabnkpgrfjwaw.supabase.co/rest/v1/posts?select=%2A&order=created_at.desc "HTTP/1.1 200 OK"
+2025-05-12 18:05:00,896 - httpcore.http11 - DEBUG - receive_response_body.started request=<Request [b'GET']>
+2025-05-12 18:05:00,896 - httpcore.http11 - DEBUG - receive_response_body.complete
+2025-05-12 18:05:00,897 - httpcore.http11 - DEBUG - response_closed.started
+2025-05-12 18:05:00,897 - httpcore.http11 - DEBUG - response_closed.complete
+2025-05-12 18:05:00,898 - httpcore.connection - DEBUG - close.started
+2025-05-12 18:05:00,898 - httpcore.connection - DEBUG - close.complete

@@ -1,23 +1,52 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageSquare, ThumbsUp, MessageCircle, Share2, Search, Filter, PlusCircle } from "lucide-react";
+import { forumApi } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CommunityForum() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
+  const [error, setError] = useState(null);
+  const { toast } = useToast();
   
-  // Mock forum posts data
-  const forumPosts = [
+  // Fetch forum posts from backend
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        setLoading(true);
+        const data = await forumApi.getAllPosts();
+        console.log("Fetched forum posts:", data);
+        setPosts(data);
+      } catch (err) {
+        console.error("Failed to fetch forum posts:", err);
+        setError(err.message);
+        toast({
+          title: "Error",
+          description: "Failed to load forum posts. " + err.message,
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchPosts();
+  }, [toast]);
+  
+  // Mock forum posts as fallback if API fails
+  const mockForumPosts = [
     {
       id: 1,
       title: "How to implement quicksort in JavaScript?",
@@ -32,98 +61,43 @@ export default function CommunityForum() {
       comments: 12,
       timestamp: "3 hours ago",
       solved: false,
+      user_id: "user123",
+      created_at: "2025-05-10T15:30:00Z"
     },
-    {
-      id: 2,
-      title: "System design interview preparation tips",
-      content: "I have a system design interview coming up next week with a FAANG company. What's the best approach to prepare in a short time? Any resources or tips would be greatly appreciated.",
-      author: {
-        name: "Robert Chen",
-        avatar: "/placeholder-user.jpg",
-      },
-      category: "interview-prep",
-      tags: ["system-design", "interview", "architecture"],
-      upvotes: 42,
-      comments: 18,
-      timestamp: "1 day ago",
-      solved: false,
-    },
-    {
-      id: 3,
-      title: "React hooks vs class components",
-      content: "I'm transitioning from class components to hooks in React. What are the best practices to follow? Are there any scenarios where class components are still preferable?",
-      author: {
-        name: "Sophia Williams",
-        avatar: "/placeholder-user.jpg",
-      },
-      category: "frontend",
-      tags: ["react", "hooks", "javascript", "frontend"],
-      upvotes: 18,
-      comments: 7,
-      timestamp: "2 days ago",
-      solved: true,
-    },
-    {
-      id: 4,
-      title: "Time complexity analysis of heap sort",
-      content: "Can someone help me understand the time complexity analysis of heap sort? Particularly why it's more efficient in certain scenarios than quicksort?",
-      author: {
-        name: "David Kim",
-        avatar: "/placeholder-user.jpg",
-      },
-      category: "algorithms",
-      tags: ["algorithms", "complexity", "dsa", "sorting"],
-      upvotes: 15,
-      comments: 5,
-      timestamp: "3 days ago",
-      solved: true,
-    },
-    {
-      id: 5,
-      title: "Preparing for behavioral interviews",
-      content: "What are some effective strategies for behavioral interviews? How do I structure my responses using the STAR method effectively?",
-      author: {
-        name: "Eliza Martinez",
-        avatar: "/placeholder-user.jpg",
-      },
-      category: "interview-prep",
-      tags: ["behavioral", "interview", "soft-skills"],
-      upvotes: 31,
-      comments: 14,
-      timestamp: "4 days ago",
-      solved: false,
-    },
-    {
-      id: 6,
-      title: "Understanding binary trees and traversal algorithms",
-      content: "I'm having trouble with tree traversal algorithms. Can someone explain the differences between inorder, preorder, and postorder traversals with examples?",
-      author: {
-        name: "Michael Johnson",
-        avatar: "/placeholder-user.jpg",
-      },
-      category: "data-structures",
-      tags: ["tree", "algorithms", "traversal", "dsa"],
-      upvotes: 22,
-      comments: 9,
-      timestamp: "5 days ago",
-      solved: false,
-    },
-    {
-      id: 7,
-      title: "Database indexing best practices",
-      content: "When should I create indexes in a database? Are there scenarios where indexing might actually slow down performance?",
-      author: {
-        name: "Jessica Liu",
-        avatar: "/placeholder-user.jpg",
-      },
-      category: "databases",
-      tags: ["sql", "database", "performance", "indexing"],
-      upvotes: 35,
-      comments: 21,
-      timestamp: "1 week ago",
-      solved: true,
-    }
+    // ...existing mock posts...
   ];
+  
+  // Use fetched posts if available, otherwise use mock posts
+  const forumPosts = posts.length > 0 ? posts.map(post => ({
+    ...post,
+    author: {
+      name: post.user_id, // Replace with actual username when user data is available
+      avatar: "/placeholder-user.jpg"
+    },
+    category: post.tags?.[0] || "general",
+    upvotes: post.upvotes || 0,
+    comments: post.comments || 0,
+    timestamp: formatTimestamp(post.created_at),
+    solved: post.solved || false
+  })) : mockForumPosts;
+  
+  // Helper to format the timestamp
+  function formatTimestamp(timestamp) {
+    if (!timestamp) return "Unknown time";
+    
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffSeconds = Math.floor((now - date) / 1000);
+    
+    if (isNaN(diffSeconds)) return "Invalid date";
+    
+    if (diffSeconds < 60) return "Just now";
+    if (diffSeconds < 3600) return `${Math.floor(diffSeconds / 60)} minutes ago`;
+    if (diffSeconds < 86400) return `${Math.floor(diffSeconds / 3600)} hours ago`;
+    if (diffSeconds < 604800) return `${Math.floor(diffSeconds / 86400)} days ago`;
+    
+    return date.toLocaleDateString();
+  }
   
   // Filter posts based on search query and active tab
   const filteredPosts = forumPosts
@@ -195,8 +169,27 @@ export default function CommunityForum() {
         </TabsList>
       </Tabs>
       
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+        </div>
+      )}
+      
+      {/* Error State */}
+      {error && !loading && (
+        <div className="text-center py-12">
+          <MessageSquare className="h-12 w-12 mx-auto text-destructive mb-4" />
+          <h3 className="text-xl font-medium mb-2">Unable to load posts</h3>
+          <p className="text-muted-foreground mb-6">
+            {error}
+          </p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      )}
+      
       {/* Forum Posts */}
-      {filteredPosts.length > 0 ? (
+      {!loading && !error && filteredPosts.length > 0 ? (
         <div className="grid gap-6">
           {filteredPosts.map((post) => (
             <motion.div
@@ -218,7 +211,7 @@ export default function CommunityForum() {
                         )}
                       </CardTitle>
                       <CardDescription className="flex flex-wrap gap-2">
-                        {post.tags.map(tag => (
+                        {post.tags && post.tags.map(tag => (
                           <Badge key={tag} variant="outline" className="cursor-pointer hover:bg-muted">
                             #{tag}
                           </Badge>
@@ -261,16 +254,18 @@ export default function CommunityForum() {
             </motion.div>
           ))}
         </div>
-      ) : (
+      ) : !loading && !error ? (
         <div className="text-center py-12">
           <MessageSquare className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-xl font-medium mb-2">No posts found</h3>
           <p className="text-muted-foreground mb-6">
             No posts match your search criteria. Try different keywords or create a new post.
           </p>
-          <Button>Create New Post</Button>
+          <Button asChild>
+            <Link href="/community-forum/create">Create New Post</Link>
+          </Button>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
