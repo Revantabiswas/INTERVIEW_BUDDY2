@@ -17,10 +17,13 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { X, ChevronLeft, MessageSquare } from "lucide-react";
+import { X, ChevronLeft, MessageSquare, Loader2 } from "lucide-react";
+import { forumApi } from "@/lib/api";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CreatePost() {
   const router = useRouter();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -29,6 +32,8 @@ export default function CreatePost() {
   });
   const [tagInput, setTagInput] = useState("");
   const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
 
   // List of categories
   const categories = [
@@ -104,16 +109,94 @@ export default function CreatePost() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  // Analyze text content to suggest tags
+  const analyzeContent = async () => {
+    if (formData.content.length < 30) {
+      toast({
+        title: "Content too short",
+        description: "Please add more content before analysis",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    try {
+      setIsAnalyzing(true);
+      const response = await forumApi.analyzeText(formData.content);
+      
+      // Add suggested tags that aren't already in the list
+      const suggestedTags = response.tags || [];
+      const newTags = suggestedTags
+        .filter(tag => !formData.tags.includes(tag))
+        .slice(0, 5 - formData.tags.length);
+      
+      if (newTags.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          tags: [...prev.tags, ...newTags].slice(0, 5)
+        }));
+        
+        toast({
+          title: "Content analyzed",
+          description: `Added ${newTags.length} suggested tags based on your content`,
+          variant: "default"
+        });
+      } else {
+        toast({
+          title: "No new tags",
+          description: "No additional tags could be suggested",
+          variant: "default"
+        });
+      }
+      
+    } catch (error) {
+      console.error("Error analyzing content:", error);
+      toast({
+        title: "Analysis Failed",
+        description: error.message || "Could not analyze your content",
+        variant: "destructive"
+      });
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validateForm()) {
-      // In a real app, you would send this data to your backend API
-      console.log("Form data being submitted:", formData);
-      
-      // Show success message and redirect (simulated for this demo)
-      alert("Post created successfully! In a real app, this would be saved to the database.");
-      router.push("/community-forum");
+      try {
+        setIsSubmitting(true);
+        
+        // Generate a unique ID and convert to string to match backend expectations
+        const userId = String(Math.floor(Date.now() / 1000)); // Unix timestamp as string ID
+        
+        // Submit post to backend API
+        await forumApi.createPost(
+          formData.title,
+          formData.content,
+          userId,
+          [...formData.tags, formData.category] // Include category as a tag
+        );
+        
+        // Show success message and redirect
+        toast({
+          title: "Success!",
+          description: "Your post has been published",
+          variant: "default"
+        });
+        
+        router.push("/community-forum");
+      } catch (error) {
+        console.error("Error creating post:", error);
+        toast({
+          title: "Error",
+          description: error.message || "Failed to create your post",
+          variant: "destructive"
+        });
+      } finally {
+        setIsSubmitting(false);
+      }
     } else {
       // Scroll to the first error
       const firstErrorField = Object.keys(errors)[0];
@@ -180,6 +263,7 @@ export default function CreatePost() {
                   value={formData.title}
                   onChange={(e) => handleChange("title", e.target.value)}
                   className={errors.title ? "border-destructive" : ""}
+                  disabled={isSubmitting}
                 />
                 {errors.title && (
                   <p className="text-sm text-destructive">{errors.title}</p>
@@ -201,13 +285,32 @@ export default function CreatePost() {
                   onChange={(e) => handleChange("content", e.target.value)}
                   rows={10}
                   className={errors.content ? "border-destructive" : ""}
+                  disabled={isSubmitting}
                 />
                 {errors.content && (
                   <p className="text-sm text-destructive">{errors.content}</p>
                 )}
-                <p className="text-xs text-muted-foreground">
-                  For code blocks, use triple backticks: ```code here```
-                </p>
+                <div className="flex justify-between items-center">
+                  <p className="text-xs text-muted-foreground">
+                    For code blocks, use triple backticks: ```code here```
+                  </p>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="sm"
+                    onClick={analyzeContent}
+                    disabled={isAnalyzing || isSubmitting || formData.content.length < 30}
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Analyzing...
+                      </>
+                    ) : (
+                      "Suggest Tags"
+                    )}
+                  </Button>
+                </div>
               </div>
               
               {/* Category */}
@@ -218,6 +321,7 @@ export default function CreatePost() {
                 <Select
                   value={formData.category}
                   onValueChange={(value) => handleChange("category", value)}
+                  disabled={isSubmitting}
                 >
                   <SelectTrigger id="category" className={errors.category ? "border-destructive" : ""}>
                     <SelectValue placeholder="Select a category" />
@@ -252,6 +356,7 @@ export default function CreatePost() {
                         onClick={() => removeTag(tag)}
                         className="ml-1 text-muted-foreground hover:text-foreground focus:outline-none"
                         aria-label={`Remove tag ${tag}`}
+                        disabled={isSubmitting}
                       >
                         <X className="h-3 w-3" />
                       </button>
@@ -270,12 +375,14 @@ export default function CreatePost() {
                       }
                     }}
                     className={errors.tags ? "border-destructive" : ""}
+                    disabled={isSubmitting || formData.tags.length >= 5}
                   />
                   <Button
                     type="button"
                     variant="secondary"
                     onClick={addTag}
                     className="ml-2"
+                    disabled={isSubmitting || formData.tags.length >= 5 || !tagInput.trim()}
                   >
                     Add
                   </Button>
@@ -290,10 +397,24 @@ export default function CreatePost() {
             </CardContent>
             
             <CardFooter className="flex justify-end space-x-4 pt-6">
-              <Button variant="outline" type="button" asChild>
+              <Button 
+                variant="outline" 
+                type="button" 
+                asChild 
+                disabled={isSubmitting}
+              >
                 <Link href="/community-forum">Cancel</Link>
               </Button>
-              <Button type="submit">Publish Post</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Publishing...
+                  </>
+                ) : (
+                  "Publish Post"
+                )}
+              </Button>
             </CardFooter>
           </form>
         </Card>

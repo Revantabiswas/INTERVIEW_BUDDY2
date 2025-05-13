@@ -11,11 +11,12 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
-import { signInWithEmail, getBrowserSupabaseClient } from "@/lib/utils/supabase-browser"
+import { signUpWithEmail, getBrowserSupabaseClient } from "@/lib/utils/supabase-browser"
 
-export default function LoginPage() {
+export default function SignupPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [fullName, setFullName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [showContent, setShowContent] = useState(false)
   const router = useRouter()
@@ -30,30 +31,32 @@ export default function LoginPage() {
     return () => clearTimeout(timer)
   }, [])
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const { data, error } = await signInWithEmail(email, password)
+      // Include the user's name in the user metadata
+      const { data, error } = await signUpWithEmail(email, password, {
+        full_name: fullName
+      })
       
       if (error) {
         throw error
       }
       
       toast({
-        title: "Login successful",
-        description: "Welcome back!",
+        title: "Registration successful",
+        description: "Please check your email to verify your account.",
       })
       
-      // Redirect to homepage after successful login
-      router.push("/")
-      router.refresh() // Refresh the page to update authentication state
+      // Redirect to login page after successful signup
+      router.push("/auth-layout/login")
     } catch (error) {
-      console.error("Login error:", error)
+      console.error("Signup error:", error)
       toast({
-        title: "Login failed",
-        description: error.message || "Please check your credentials and try again.",
+        title: "Signup failed",
+        description: error.message || "Please check your information and try again.",
         variant: "destructive"
       })
     } finally {
@@ -61,8 +64,8 @@ export default function LoginPage() {
     }
   }
 
-  // Function to handle login with OAuth providers
-  const handleOAuthLogin = async (provider) => {
+  // Function to handle signup with OAuth providers
+  const handleOAuthSignup = async (provider) => {
     setIsLoading(true)
     
     try {
@@ -80,10 +83,10 @@ export default function LoginPage() {
       
       // The user will be redirected to the OAuth provider
     } catch (error) {
-      console.error(`${provider} login error:`, error)
+      console.error(`${provider} signup error:`, error)
       toast({
-        title: "Login failed",
-        description: error.message || `Could not sign in with ${provider}.`,
+        title: "Signup failed",
+        description: error.message || `Could not sign up with ${provider}.`,
         variant: "destructive"
       })
       setIsLoading(false)
@@ -114,44 +117,43 @@ export default function LoginPage() {
             transition={{ delay: 0.5 }}
           >
             <h1 className="text-4xl font-bold text-white mb-6">
-              Ace Your Technical Interviews
+              Start Your Interview Prep Journey
             </h1>
             <p className="text-xl text-white/90 max-w-md leading-relaxed">
-              Transform the way you prepare with personalized AI-powered practice sessions, curated study paths, and real-time feedback.
+              Join thousands of developers who use Interview Buddy AI to prepare for technical interviews and land their dream jobs.
             </p>
             
             <div className="mt-10">
               <div className="flex items-center gap-3 mb-4">
                 <div className="bg-primary/20 p-2 rounded-full">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="m16 6 4 14"></path><path d="M12 6v14"></path><path d="M8 8v12"></path><path d="M4 4v16"></path>
+                    <path d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>
                   </svg>
                 </div>
-                <span className="text-white/90">Track your progress over time</span>
+                <span className="text-white/90">Start preparing in minutes</span>
               </div>
               <div className="flex items-center gap-3 mb-4">
                 <div className="bg-primary/20 p-2 rounded-full">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <path d="M18 8h1a4 4 0 1 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line>
                   </svg>
                 </div>
-                <span className="text-white/90">Access curated study materials</span>
+                <span className="text-white/90">Free to get started</span>
               </div>
               <div className="flex items-center gap-3">
                 <div className="bg-primary/20 p-2 rounded-full">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    <path d="M20 7h-9"></path><path d="M14 17H5"></path><circle cx="17" cy="17" r="3"></circle><circle cx="7" cy="7" r="3"></circle>
                   </svg>
                 </div>
-                <span className="text-white/90">Practice with AI mock interviews</span>
+                <span className="text-white/90">Personalized learning path</span>
               </div>
             </div>
           </motion.div>
         </div>
       </motion.div>
 
-      {/* Right side - Login Form with Interview Buddy logo */}
+      {/* Right side - Signup Form with Interview Buddy logo */}
       <motion.div
         className="w-full md:w-1/2 flex items-center justify-center p-8 bg-background"
         initial={{ x: "100%" }}
@@ -180,13 +182,25 @@ export default function LoginPage() {
             
             <Card className="border-muted/30 shadow-lg">
               <CardHeader>
-                <CardTitle className="text-2xl text-center">Welcome Back</CardTitle>
+                <CardTitle className="text-2xl text-center">Create an Account</CardTitle>
                 <CardDescription className="text-center">
-                  Sign in to continue your interview preparation
+                  Sign up to start your interview preparation journey
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={handleSignup} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name</Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="John Doe"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                      className="border-input/60"
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -200,15 +214,7 @@ export default function LoginPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <Label htmlFor="password">Password</Label>
-                      <Link
-                        href="/forgot-password"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        Forgot password?
-                      </Link>
-                    </div>
+                    <Label htmlFor="password">Password</Label>
                     <Input
                       id="password"
                       type="password"
@@ -218,6 +224,7 @@ export default function LoginPage() {
                       required
                       className="border-input/60"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">Password must be at least 8 characters long</p>
                   </div>
                   <Button 
                     className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 transition-all" 
@@ -230,9 +237,9 @@ export default function LoginPage() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        <span>Signing in...</span>
+                        <span>Creating account...</span>
                       </div>
-                    ) : "Sign In"}
+                    ) : "Sign Up"}
                   </Button>
                 </form>
               </CardContent>
@@ -250,7 +257,7 @@ export default function LoginPage() {
                   <Button 
                     variant="outline" 
                     className="gap-2"
-                    onClick={() => handleOAuthLogin('github')}
+                    onClick={() => handleOAuthSignup('github')}
                     disabled={isLoading}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -261,20 +268,20 @@ export default function LoginPage() {
                   <Button 
                     variant="outline" 
                     className="gap-2"
-                    onClick={() => handleOAuthLogin('facebook')}
+                    onClick={() => handleOAuthSignup('google')}
                     disabled={isLoading}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                      <circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path>
                     </svg>
-                    Facebook
+                    Google
                   </Button>
                 </div>
                 
                 <p className="text-center text-sm">
-                  Don't have an account?{" "}
-                  <Link href="/signup" className="text-primary hover:underline font-medium">
-                    Sign up
+                  Already have an account?{" "}
+                  <Link href="/auth-layout/login" className="text-primary hover:underline font-medium">
+                    Sign in
                   </Link>
                 </p>
               </CardFooter>
@@ -285,4 +292,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

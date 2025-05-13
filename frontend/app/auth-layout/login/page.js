@@ -203,7 +203,7 @@ export default function LoginPage() {
                     <div className="flex justify-between">
                       <Label htmlFor="password">Password</Label>
                       <Link
-                        href="/forgot-password"
+                        href="/auth-layout/forgot-password"
                         className="text-sm text-primary hover:underline"
                       >
                         Forgot password?
@@ -261,19 +261,19 @@ export default function LoginPage() {
                   <Button 
                     variant="outline" 
                     className="gap-2"
-                    onClick={() => handleOAuthLogin('facebook')}
+                    onClick={() => handleOAuthLogin('google')}
                     disabled={isLoading}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path>
+                      <circle cx="12" cy="12" r="10"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path>
                     </svg>
-                    Facebook
+                    Google
                   </Button>
                 </div>
                 
                 <p className="text-center text-sm">
                   Don't have an account?{" "}
-                  <Link href="/signup" className="text-primary hover:underline font-medium">
+                  <Link href="/auth-layout/signup" className="text-primary hover:underline font-medium">
                     Sign up
                   </Link>
                 </p>
@@ -285,4 +285,3 @@ export default function LoginPage() {
     </div>
   )
 }
-

@@ -850,6 +850,86 @@ const progressApi = {
   },
 };
 
+// Forum API
+const forumApi = {
+  getAllPosts: async () => {
+    try {
+      console.log("Fetching all forum posts");
+      const response = await api.get('/api/forum/posts');
+      console.log("Forum posts response:", response);
+      
+      if (Array.isArray(response)) {
+        return response;
+      } else if (response && Array.isArray(response.data)) {
+        return response.data;
+      } else {
+        console.warn("Unexpected forum posts response format:", response);
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching forum posts:", error);
+      throw new Error(error.response?.data?.detail || "Failed to fetch forum posts");
+    }
+  },
+  
+  getPost: async (postId) => {
+    try {
+      console.log(`Fetching forum post ${postId}`);
+      const response = await api.get(`/api/forum/posts/${postId}`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching forum post ${postId}:`, error);
+      throw new Error(error.response?.data?.detail || "Failed to fetch forum post");
+    }
+  },
+  
+  createPost: async (title, content, userId, tags = []) => {
+    try {
+      console.log(`Creating forum post: ${title}`);
+      // Use direct axios call to avoid response interceptor issues
+      const response = await axios({
+        method: 'post',
+        url: `${API_BASE_URL}/api/forum/create-post`,
+        data: {
+          title,
+          content,
+          user_id: userId,
+          tags
+        },
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 30000,
+      });
+      
+      console.log("Create post response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error creating forum post:", error);
+      // More detailed error extraction
+      const errorMessage = 
+        error.response?.data?.detail || 
+        (typeof error.message === 'string' ? error.message : 'Failed to create forum post');
+      throw new Error(errorMessage);
+    }
+  },
+  
+  analyzeText: async (text, options = {}) => {
+    try {
+      console.log(`Analyzing text: ${text.substring(0, 50)}...`);
+      const response = await api.post('/api/forum/analyze-text', {
+        text,
+        options
+      });
+      console.log("Text analysis response:", response);
+      return response;
+    } catch (error) {
+      console.error("Error analyzing text:", error);
+      throw new Error(error.response?.data?.detail || "Failed to analyze text");
+    }
+  }
+};
+
 // Export all APIs
 export {
   documentApi,
@@ -861,6 +941,7 @@ export {
   testsApi,
   dsaApi,
   progressApi,
+  forumApi,
 };
 
 export default {
@@ -873,4 +954,5 @@ export default {
   tests: testsApi,
   dsa: dsaApi,
   progress: progressApi,
+  forum: forumApi,
 };

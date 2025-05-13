@@ -25,3 +25,4 @@ backend/backend/logs/info.log
 backend/backend/logs/warning.log
 backend/backend/logs/critical.log
 
+*.pyc
