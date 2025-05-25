@@ -71,9 +71,8 @@ export default function SignupPage() {
     try {
       const supabase = getBrowserSupabaseClient()
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+        provider,        options: {
+          redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`
         }
       })
       

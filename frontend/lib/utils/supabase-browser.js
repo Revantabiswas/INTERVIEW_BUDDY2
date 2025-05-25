@@ -50,15 +50,15 @@ export async function signOut() {
   return await supabase.auth.signOut()
 }
 
-// Get the current user session
+// Get current session (faster than getUser)
 export async function getCurrentSession() {
   const supabase = getBrowserSupabaseClient()
-  const { data, error } = await supabase.auth.getSession()
-  return { session: data.session, error }
+  return await supabase.auth.getSession()
 }
 
-// Get the current user
+// Get current user data
 export async function getCurrentUser() {
-  const { session } = await getCurrentSession()
-  return session?.user || null
+  const supabase = getBrowserSupabaseClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user
 }

@@ -7,7 +7,12 @@ import UserAvatar from "@/components/user-avatar"
 
 export default function ClientLayout({ children }) {
   const pathname = usePathname()
-  const isFullScreenPage = pathname === "/login" || pathname === "/register" || pathname === "/splash"
+  const isFullScreenPage = pathname === "/" || 
+                           pathname === "/login" || 
+                           pathname === "/signup" || 
+                           pathname === "/register" || 
+                           pathname === "/splash" ||
+                           pathname.startsWith("/auth-layout")
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   
   // Check localStorage on client-side to sync sidebar state

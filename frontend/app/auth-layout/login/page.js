@@ -21,13 +21,15 @@ export default function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
 
-  // Animation to reveal content after page load
+  // Prefetch dashboard route for faster navigation
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowContent(true)
-    }, 300)
+    router.prefetch('/dashboard')
+  }, [router])
 
-    return () => clearTimeout(timer)
+  // Animation to reveal content after page load - optimized for speed
+  useEffect(() => {
+    // Show content immediately for faster user experience
+    setShowContent(true)
   }, [])
 
   const handleLogin = async (e) => {
@@ -40,15 +42,13 @@ export default function LoginPage() {
       if (error) {
         throw error
       }
-      
-      toast({
+        toast({
         title: "Login successful",
-        description: "Welcome back!",
+        description: "Redirecting to dashboard...",
       })
       
-      // Redirect to homepage after successful login
-      router.push("/")
-      router.refresh() // Refresh the page to update authentication state
+      // Redirect to dashboard after successful login
+      router.replace("/dashboard")
     } catch (error) {
       console.error("Login error:", error)
       toast({
@@ -60,8 +60,7 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
-
-  // Function to handle login with OAuth providers
+  // Function to handle login with OAuth providers - redirect to dashboard
   const handleOAuthLogin = async (provider) => {
     setIsLoading(true)
     
@@ -70,7 +69,7 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`
         }
       })
       
@@ -78,7 +77,7 @@ export default function LoginPage() {
         throw error
       }
       
-      // The user will be redirected to the OAuth provider
+      // The user will be redirected to the OAuth provider and then to dashboard
     } catch (error) {
       console.error(`${provider} login error:`, error)
       toast({

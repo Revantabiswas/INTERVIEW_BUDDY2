@@ -37,22 +37,23 @@ import { useToast } from "@/components/ui/use-toast"
 
 // Main navigation items
 const navItems = [
-  { name: "Home", href: "/", icon: Home },
-  { name: "DSA Practice", href: "/dsa-practice", icon: Code },
+  { name: "Home", href: "/dashboard", icon: Home },
+  { name: "DSA Practice", href: "/dashboard/dsa-practice", icon: Code },
+  { name: "Tests", href: "/dashboard/exam-practice", icon: Code },
   // Document workspace section is now handled separately
-  { name: "Flashcards", href: "/flashcards", icon: BookMarked },
-  { name: "Study Roadmap", href: "/study-roadmap", icon: Map },
-  { name: "Practice Tests", href: "/practice-tests", icon: FlaskConical },
-  { name: "Forums", href: "/community-forum", icon: FileCode },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Flashcards", href: "/dashboard/flashcards", icon: BookMarked },
+  { name: "Study Roadmap", href: "/dashboard/study-roadmap", icon: Map },
+  { name: "Practice Tests", href: "/dashboard/practice-tests", icon: FlaskConical },
+  { name: "Forums", href: "/dashboard/community-forum", icon: FileCode },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
 
 // Document workspace section with nested items
 const documentItems = [
-  { name: "Document Workspace", href: "/document-workspace", icon: Files, isParent: true },
-  { name: "Upload Documents", href: "/document-workspace", icon: FileUp, isChild: true },
-  { name: "AI Chat Assistant", href: "/document-workspace", icon: Bot, isChild: true },
-  { name: "Study Notes", href: "/document-workspace", icon: BookOpen, isChild: true },
+  { name: "Document Workspace", href: "/dashboard/document-workspace", icon: Files, isParent: true },
+  { name: "Upload Documents", href: "/dashboard/document-workspace", icon: FileUp, isChild: true },
+  { name: "AI Chat Assistant", href: "/dashboard/document-workspace", icon: Bot, isChild: true },
+  { name: "Study Notes", href: "/dashboard/document-workspace", icon: BookOpen, isChild: true },
 ]
 
 export default function Sidebar() {

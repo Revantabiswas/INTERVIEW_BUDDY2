@@ -20,16 +20,17 @@ export default function LoginPage() {
   const [showContent, setShowContent] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
-
-  // Animation to reveal content after page load
+    // Prefetch dashboard route for faster navigation
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowContent(true)
-    }, 300)
-
-    return () => clearTimeout(timer)
+    router.prefetch('/dashboard')
+  }, [router])
+  
+  // Animation to reveal content after page load - optimized for speed
+  useEffect(() => {
+    // Show content immediately for faster user experience
+    setShowContent(true)
   }, [])
-
+  
   const handleLogin = async (e) => {
     e.preventDefault()
     setIsLoading(true)
@@ -41,14 +42,25 @@ export default function LoginPage() {
         throw error
       }
       
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
-      })
+      // Check if login was successful by verifying the session
+      if (data?.user) {
+        // Show success message
+        toast({
+          title: "Login successful",
+          description: "Redirecting to dashboard...",
+        })
+        
+        // Use router.replace for client-side navigation first
+        router.replace("/dashboard")
+        
+        // Fallback with window.location after a short delay if router doesn't work
+        setTimeout(() => {
+          if (window.location.pathname !== "/dashboard") {
+            window.location.href = "/dashboard"
+          }
+        }, 500)
+      }
       
-      // Redirect to homepage after successful login
-      router.push("/")
-      router.refresh() // Refresh the page to update authentication state
     } catch (error) {
       console.error("Login error:", error)
       toast({
@@ -60,8 +72,7 @@ export default function LoginPage() {
       setIsLoading(false)
     }
   }
-
-  // Function to handle login with OAuth providers
+  // Function to handle login with OAuth providers - optimized redirect
   const handleOAuthLogin = async (provider) => {
     setIsLoading(true)
     
@@ -70,7 +81,7 @@ export default function LoginPage() {
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/auth/callback`
+          redirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`
         }
       })
       
@@ -78,7 +89,7 @@ export default function LoginPage() {
         throw error
       }
       
-      // The user will be redirected to the OAuth provider
+      // The user will be redirected to the OAuth provider and then to dashboard
     } catch (error) {
       console.error(`${provider} login error:`, error)
       toast({

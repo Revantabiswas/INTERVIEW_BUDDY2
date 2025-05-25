@@ -155,3 +155,63 @@ class RoadmapResponse(BaseModel):
 
 class ErrorResponse(BaseModel):
     detail: str
+
+# Progress Tracking Models
+class ProgressMetrics(BaseModel):
+    total_completed: int = 0
+    total_attempted: int = 0
+    success_rate: float = 0.0
+    average_attempts: float = 0.0
+    by_difficulty: Dict[str, int] = {"Easy": 0, "Medium": 0, "Hard": 0}
+    by_topic: Dict[str, Dict[str, int]] = {}
+    by_company: Dict[str, Dict[str, int]] = {}
+    trending_topics: List[str] = []
+
+class StudySession(BaseModel):
+    date: str
+    duration_minutes: int
+    questions_attempted: int
+    questions_completed: int
+    focus_topics: List[str] = []
+
+class QuestionProgress(BaseModel):
+    id: int
+    title: str
+    status: str  # "not_started", "attempted", "completed"
+    attempts: int = 0
+    first_attempt_date: Optional[str] = None
+    completed_date: Optional[str] = None
+    time_spent_minutes: int = 0
+    difficulty: str
+    topics: List[str] = []
+    companies: List[str] = []
+    solution_saved: bool = False
+    notes: Optional[str] = None
+
+class ProgressData(BaseModel):
+    user_id: str = "default"
+    questions: List[QuestionProgress] = []
+    study_sessions: List[StudySession] = []
+    goals: Dict[str, Any] = {}
+    preferences: Dict[str, Any] = {}
+    last_updated: str
+
+class ProgressUpdateRequest(BaseModel):
+    question_progress: Optional[QuestionProgress] = None
+    study_session: Optional[StudySession] = None
+    goals_update: Optional[Dict[str, Any]] = None
+    preferences_update: Optional[Dict[str, Any]] = None
+
+class ProgressResponse(BaseModel):
+    metrics: ProgressMetrics
+    recent_activity: List[StudySession]
+    recommendations: List[str] = []
+    achievements: List[str] = []
+
+class ProgressAnalytics(BaseModel):
+    weekly_progress: Dict[str, int]
+    difficulty_breakdown: Dict[str, Dict[str, int]]
+    topic_performance: Dict[str, float]
+    company_focus: Dict[str, int]
+    study_streaks: Dict[str, int]
+    time_analytics: Dict[str, Any]

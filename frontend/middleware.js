@@ -3,6 +3,7 @@ import { createServerSupabaseClient } from '@/lib/utils/supabase.js'
 
 // Array of routes that require authentication
 const protectedRoutes = [
+  '/dashboard',
   '/document-workspace',
   '/dsa-practice',
   '/study-notes',
@@ -56,11 +57,10 @@ export async function middleware(request) {
     redirectUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(redirectUrl)
   }
-  
-  // If user is logged in and is trying to access login or signup
+    // If user is logged in and is trying to access login or signup
   if (session && authRoutes.some(route => pathname.startsWith(route))) {
-    // Redirect to home page
-    return NextResponse.redirect(new URL('/', request.url))
+    // Redirect to dashboard instead of home page for better UX
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
   
   return NextResponse.next()

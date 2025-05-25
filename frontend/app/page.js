@@ -5,116 +5,204 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Code, FileUp, MessageSquare, BookOpen, Network, Calendar, FileCode, ChevronRight, Star, Zap } from "lucide-react";
-import Background from "./background";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Code,
+  FileUp,
+  MessageSquare,
+  BookOpen,
+  Network,
+  Calendar,
+  FileCode,
+  ChevronRight,
+  Star,
+  Zap,
+  Sparkles,
+  Brain,
+  Target,
+  Users,
+  Trophy,
+  PlayCircle,
+  Shield,
+  Rocket,
+  Globe,
+  Clock,
+  CheckCircle2,
+} from "lucide-react";
+import Navbar from "@/components/navbar";
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
-  // Code snippets that will appear to be flying across the screen
+  // Enhanced code snippets with more variety
   const codeSnippets = [
-    "function quickSort(arr) { /* ... */ }",
-    "class TreeNode { constructor(val) { this.val = val; this.left = null; this.right = null; } }",
-    "const binarySearch = (arr, target) => { /* ... */ }",
-    "function dijkstra(graph, start) { /* ... */ }",
-    "async function fetchData() { const response = await fetch('/api'); }",
-    "useEffect(() => { /* ... */ }, [dependencies]);",
-    "const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);",
-    "function mergeSort(arr) { if (arr.length <= 1) return arr; }",
-    "#include <iostream>",
-    "public static void main(String[] args) { /* ... */ }",
-    "def depth_first_search(graph, node): # ...",
-    "SELECT * FROM users WHERE role = 'interviewer'",
+    "function quickSort(arr) { return arr.sort((a,b) => a-b); }",
+    "class BinaryTree { constructor() { this.root = null; } }",
+    "const fibonacci = (n) => n <= 1 ? n : fibonacci(n-1) + fibonacci(n-2);",
+    "async function fetchUserData() { return await api.get('/users'); }",
+    "const [state, setState] = useState(initialValue);",
+    "SELECT * FROM interviews WHERE status = 'passed';",
+    "def merge_sort(arr): return sorted(arr)",
+    "import React, { useEffect, useState } from 'react';",
+    "const memoized = useMemo(() => expensive(), [deps]);",
+    "git commit -m 'Fix: interview preparation logic'",
+    "docker run -p 3000:3000 interview-app",
+    "export const InterviewConfig = { timeout: 3600 };",
   ];
-
-  useEffect(() => {
-    setMounted(true);
-    
-    // Rotate through features every 5 seconds
-    const interval = setInterval(() => {
-      setActiveFeatureIndex((prev) => (prev + 1) % features.length);
-    }, 5000);
-    
-    return () => clearInterval(interval);
-  }, []);
 
   const features = [
     {
       icon: Code,
-      title: "DSA Practice Questions",
-      description: "Master algorithms and data structures with our curated collection of 500+ practice problems organized by difficulty, topic, and company. Get AI-assisted hints and step-by-step solutions.",
-      href: "/dsa-practice",
-      color: "from-blue-500 to-cyan-400",
+      title: "Smart DSA Practice",
+      description:
+        "AI-curated coding challenges that adapt to your skill level. Practice 1000+ problems from top companies with real-time hints and solutions.",
+      href: "/login",
+      color: "from-blue-500 via-blue-600 to-cyan-500",
+      badge: "Most Popular",
+    },
+    {
+      icon: Brain,
+      title: "AI Interview Coach",
+      description:
+        "Get personalized feedback on your interview performance. Our AI analyzes your responses and provides actionable improvement suggestions.",
+      href: "/login",
+      color: "from-purple-500 via-purple-600 to-pink-500",
+      badge: "AI Powered",
     },
     {
       icon: FileUp,
-      title: "Document Upload",
-      description: "Upload study materials in PDF, DOCX, or TXT format for AI processing. Our system analyzes your content to create flashcards, practice questions, and custom study guides.",
-      href: "/document-upload",
-      color: "from-purple-500 to-pink-400",
+      title: "Document Intelligence",
+      description:
+        "Upload your resume, job descriptions, or study materials. Our AI creates custom practice questions and interview scenarios.",
+      href: "/login",
+      color: "from-green-500 via-green-600 to-emerald-500",
+      badge: "Smart Upload",
     },
     {
-      icon: MessageSquare,
-      title: "AI-Powered Chat",
-      description: "Get instant answers to your technical questions with our specialized AI assistant. Discuss algorithms, system design, and receive code reviews with detailed explanations.",
-      href: "/ai-chat",
-      color: "from-green-500 to-emerald-400",
-    },
-    {
-      icon: BookOpen,
-      title: "Study Notes Generator",
-      description: "Transform lengthy documents into concise, well-structured study notes. Customize the format, highlight key concepts, and generate practice questions from your notes.",
-      href: "/study-notes",
-      color: "from-yellow-500 to-amber-400",
+      icon: Target,
+      title: "Mock Interviews",
+      description:
+        "Practice with realistic interview simulations. Record yourself, get AI feedback, and track your improvement over time.",
+      href: "/login",
+      color: "from-orange-500 via-orange-600 to-red-500",
+      badge: "Practice Mode",
     },
     {
       icon: Network,
-      title: "Mind Map Generator",
-      description: "Visualize complex concepts and their relationships in interactive mind maps. Export as images or PDFs, collaborate with peers, and expand your understanding through visual learning.",
-      href: "/mind-maps",
-      color: "from-red-500 to-orange-400",
+      title: "Visual Learning Maps",
+      description:
+        "Transform complex concepts into interactive mind maps. Visualize algorithms, system designs, and technical concepts.",
+      href: "/login",
+      color: "from-teal-500 via-teal-600 to-blue-500",
+      badge: "Visual",
     },
     {
       icon: Calendar,
-      title: "Study Roadmap",
-      description: "Get a personalized study plan based on your goals, timeline, and assessment results. Track your progress, receive reminders, and adjust your plan as you improve.",
-      href: "/study-roadmap",
-      color: "from-indigo-500 to-violet-400",
-    },
-    {
-      icon: FileCode,
-      title: "Code Debugging",
-      description: "Get AI-powered feedback and debugging tips for your code. Upload snippets, explain your intent, and receive optimization suggestions and best practices.",
-      href: "/code-debugging",
-      color: "from-sky-500 to-blue-400",
+      title: "Personalized Roadmaps",
+      description:
+        "Get a custom study plan based on your target role, timeline, and current skill level. Track progress with smart analytics.",
+      href: "/login",
+      color: "from-indigo-500 via-indigo-600 to-purple-500",
+      badge: "Custom Plan",
     },
   ];
 
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      role: "Software Engineer at Google",
+      content:
+        "InterviewBuddy's AI coach helped me identify my weak spots and practice systematically. Landed my dream job in 3 months!",
+      rating: 5,
+      avatar: "SC",
+    },
+    {
+      name: "Marcus Rodriguez",
+      role: "Senior Developer at Microsoft",
+      content:
+        "The mock interviews felt so real. The AI feedback was incredibly detailed and helped me improve my communication skills.",
+      rating: 5,
+      avatar: "MR",
+    },
+    {
+      name: "Priya Patel",
+      role: "Tech Lead at Amazon",
+      content:
+        "Best investment I made for my career. The personalized roadmap kept me focused and the progress tracking was motivating.",
+      rating: 5,
+      avatar: "PP",
+    },
+  ];
+
+  const stats = [
+    { icon: Users, value: "50K+", label: "Success Stories" },
+    { icon: Trophy, value: "98%", label: "Success Rate" },
+    { icon: Code, value: "1000+", label: "Practice Problems" },
+    { icon: Clock, value: "24/7", label: "AI Support" },
+  ];
+
+  useEffect(() => {
+    setMounted(true);
+
+    const handleMouseMove = (e) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    const interval = setInterval(() => {
+      setActiveFeatureIndex((prev) => (prev + 1) % features.length);
+    }, 4000);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [features.length]);
   return (
-    <div className="min-h-screen overflow-x-hidden">
-      {/* Flying code elements that appear across the page */}
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800">
+      <Navbar />
+      {/* Dynamic mouse follower */}
+      {mounted && (
+        <motion.div
+          className="fixed w-6 h-6 bg-blue-500/20 rounded-full pointer-events-none z-50 mix-blend-multiply dark:mix-blend-screen"
+          animate={{
+            x: mousePosition.x - 12,
+            y: mousePosition.y - 12,
+          }}
+          transition={{ type: "spring", stiffness: 500, damping: 28 }}
+        />
+      )}
+
+      {/* Flying code snippets */}
       {mounted && (
         <>
           {codeSnippets.map((snippet, index) => (
             <motion.div
               key={index}
-              className="fixed pointer-events-none font-mono text-sm whitespace-nowrap text-primary/40 dark:text-primary/50 filter blur-[0.3px]"
+              className="fixed pointer-events-none font-mono text-xs whitespace-nowrap text-blue-500/30 dark:text-blue-400/30 z-10"
               initial={{
-                x: index % 2 === 0 ? -200 : window.innerWidth + 200,
-                y: (Math.random() * window.innerHeight),
+                x: index % 2 === 0 ? -300 : window.innerWidth + 300,
+                y: Math.random() * window.innerHeight,
                 opacity: 0,
               }}
               animate={{
-                x: index % 2 === 0 ? window.innerWidth + 200 : -200,
-                y: (Math.random() * window.innerHeight),
-                opacity: [0, 0.7, 0],
+                x: index % 2 === 0 ? window.innerWidth + 300 : -300,
+                y: Math.random() * window.innerHeight,
+                opacity: [0, 0.8, 0],
               }}
               transition={{
-                duration: Math.random() * 20 + 15,
+                duration: Math.random() * 25 + 20,
                 ease: "linear",
-                delay: Math.random() * 10,
+                delay: Math.random() * 15,
                 repeat: Infinity,
                 repeatType: "loop",
               }}
@@ -126,303 +214,374 @@ export default function Home() {
       )}
 
       <div className="container mx-auto px-4 py-8">
-        {/* Enhanced Hero Section with 3D elements */}
-        <section className="relative py-24 md:py-36 overflow-hidden">
-          {/* Gradient background with animated glow */}
-          {/* <Background /> */}
-
-          {/* 3D Floating Elements with enhanced animations */}
+        {/* Hero Section */}
+        <section className="relative py-20 md:py-32 overflow-hidden">
+          {/* Animated background elements */}
           <motion.div
-            className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full bg-gradient-to-br from-primary/10 to-purple-500/10 blur-3xl"
+            className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-3xl"
             animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.4, 0.6, 0.4],
+              scale: [1, 1.3, 1],
+              opacity: [0.3, 0.7, 0.3],
+              rotate: [0, 180, 360],
             }}
             transition={{
-              duration: 8,
+              duration: 12,
               repeat: Infinity,
               ease: "easeInOut",
             }}
           />
           <motion.div
-            className="absolute bottom-1/4 right-1/4 w-56 h-56 rounded-full bg-gradient-to-br from-blue-500/10 to-primary/10 blur-3xl"
+            className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-gradient-to-br from-green-500/10 to-blue-500/10 blur-3xl"
             animate={{
               scale: [1.2, 1, 1.2],
-              opacity: [0.5, 0.3, 0.5],
+              opacity: [0.4, 0.8, 0.4],
+              rotate: [360, 180, 0],
             }}
             transition={{
-              duration: 10,
+              duration: 15,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: 2,
+              delay: 3,
             }}
           />
 
-          {/* 3D Geometric Shapes with more dynamic animations */}
-          <motion.div 
-            className="absolute top-20 left-[10%] w-20 h-20 rounded-lg border border-primary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)] transform-gpu"
-            animate={{
-              rotate: [0, 360],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              rotate: {
-                duration: 20,
-                repeat: Infinity,
-                ease: "linear",
-              },
-              scale: {
-                duration: 8,
+          {/* Floating geometric shapes */}
+          {[...Array(8)].map((_, i) => (
+            <motion.div
+              key={i}
+              className={`absolute w-${4 + (i % 3) * 2} h-${4 + (i % 3) * 2} ${
+                i % 3 === 0
+                  ? "rounded-full"
+                  : i % 3 === 1
+                  ? "rounded-lg"
+                  : "rounded-md rotate-45"
+              } bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-white/20`}
+              initial={{
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                x: [0, Math.random() * 50 - 25, 0],
+                rotate: [0, 360],
+              }}
+              transition={{
+                duration: Math.random() * 10 + 15,
                 repeat: Infinity,
                 ease: "easeInOut",
-              },
-            }}
-          />
-          <motion.div 
-            className="absolute bottom-20 right-[10%] w-24 h-24 rounded-full border border-primary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)] transform-gpu"
-            animate={{
-              y: [0, -30, 0],
-              x: [0, 15, 0],
-            }}
-            transition={{
-              duration: 6,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <motion.div 
-            className="absolute top-1/3 right-[20%] w-16 h-16 rounded-md border border-primary/20 backdrop-blur-sm shadow-[0_0_15px_rgba(0,0,0,0.1)] transform-gpu"
-            animate={{
-              rotate: [45, 0, 45],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 10,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1,
-            }}
-          />
+                delay: Math.random() * 5,
+              }}
+              style={{
+                left: `${10 + (i * 15) % 80}%`,
+                top: `${20 + (i * 10) % 60}%`,
+              }}
+            />
+          ))}
 
-          <div className="relative z-10 text-center max-w-5xl mx-auto px-4">
+          <div className="relative z-20 text-center max-w-6xl mx-auto">
+            {/* Brand header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
+              className="inline-flex items-center gap-3 mb-8 bg-white/10 backdrop-blur-md rounded-full px-6 py-3 border border-white/20"
             >
-              <h1 className="text-4xl md:text-7xl font-bold mb-6 tracking-tight">
-                Ace Your Technical Interviews with{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-red-500 to-red-500">
-                  InterviewBuddy AI
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center">
+                <Sparkles className="h-5 w-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                InterviewBuddy AI
+              </span>
+              <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full">
+                Beta
+              </div>
+            </motion.div>
+
+            {/* Main headline */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+            >
+              <h1 className="text-4xl md:text-7xl font-bold mb-8 leading-tight">
+                Master Your Next
+                <br />
+                <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 bg-clip-text text-transparent">
+                  Technical Interview
+                </span>
+                <br />
+                <span className="text-2xl md:text-4xl text-muted-foreground font-medium">
+                  with AI-Powered Precision
                 </span>
               </h1>
             </motion.div>
-            
-            <motion.p 
-              className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto mb-10 leading-relaxed"
+
+            {/* Subtitle */}
+            <motion.p
+              className="text-lg md:text-xl text-muted-foreground max-w-4xl mx-auto mb-12 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
             >
-              Your AI-powered companion for interview preparation, coding challenges, and technical exams. Get personalized study plans, practice with real interview questions, and receive instant feedback.
+              Transform your interview preparation with personalized AI coaching,
+              adaptive practice problems, and real-time feedback. Join 50,000+
+              developers who've accelerated their careers.
             </motion.p>
-            
-            <motion.div 
-              className="flex flex-wrap justify-center gap-4"
+
+            {/* CTA Buttons */}
+            <motion.div
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
             >
-              <Button 
-                size="lg" 
-                className="shadow-lg hover:shadow-xl transition-all bg-gradient-to-r from-primary to-blue-600 hover:from-primary/90 hover:to-blue-700"
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-10 py-6 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all"
+                  asChild
+                >
+                  <Link href="/login" className="flex items-center gap-2">
+                    <PlayCircle className="h-5 w-5" />
+                    Start Free Trial
+                    <ChevronRight className="h-5 w-5" />
+                  </Link>
+                </Button>
+              </motion.div>
+
+              <Button
+                size="lg"
+                variant="outline"
+                className="px-10 py-6 text-lg border-2 backdrop-blur-sm bg-white/5 hover:bg-white/10"
                 asChild
               >
-                <Link href="/dsa-practice" className="text-base gap-2">
-                  Start Practicing Now <ChevronRight className="h-4 w-4" />
+                <Link href="/login" className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Sign In
                 </Link>
               </Button>
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="shadow-md hover:shadow-lg transition-all border-primary/20 hover:border-primary/40"
-                asChild
-              >
-                <Link href="/login">Sign In</Link>
-              </Button>
             </motion.div>
-            
-            {/* Key stats */}
-            <motion.div 
-              className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto"
+
+            {/* Stats */}
+            <motion.div
+              className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.9 }}
+              transition={{ duration: 0.8, delay: 1.1 }}
             >
-              <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/50">
-                <div className="text-3xl font-bold text-primary">500+</div>
-                <div className="text-sm text-muted-foreground">Practice Problems</div>
-              </div>
-              <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/50">
-                <div className="text-3xl font-bold text-primary">24/7</div>
-                <div className="text-sm text-muted-foreground">AI Assistance</div>
-              </div>
-              <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/50">
-                <div className="text-3xl font-bold text-primary">10k+</div>
-                <div className="text-sm text-muted-foreground">Users</div>
-              </div>
-              <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 border border-border/50">
-                <div className="text-3xl font-bold text-primary">97%</div>
-                <div className="text-sm text-muted-foreground">Success Rate</div>
-              </div>
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white/10 backdrop-blur-md rounded-xl p-6 border border-white/20 hover:bg-white/20 transition-all"
+                  whileHover={{ y: -5, scale: 1.02 }}
+                >
+                  <stat.icon className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+                  <div className="text-2xl md:text-3xl font-bold text-blue-600 mb-1">
+                    {stat.value}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {stat.label}
+                  </div>
+                </motion.div>
+              ))}
             </motion.div>
           </div>
 
-          {/* Enhanced 3D Code Blocks with animations */}
-          <motion.div 
-            className="hidden lg:block absolute -left-20 top-1/3 w-80 h-48 bg-card/70 backdrop-blur-sm border border-border rounded-lg perspective-3d transform-3d shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgb(59,130,246,0.2)] transition-all duration-500"
-            initial={{ x: -200, rotate: -12, opacity: 0 }}
-            animate={{ x: 0, rotate: -12, opacity: 1 }}
-            transition={{ duration: 1, delay: 1 }}
-            whileHover={{ x: 20, y: -5, transition: { duration: 0.3 } }}
-            style={{ boxShadow: "0 20px 40px -15px rgba(0,0,0,0.1), 0 5px 20px -5px rgba(0,0,0,0.05)" }}
+          {/* Floating code blocks */}
+          <motion.div
+            className="hidden xl:block absolute -left-10 top-1/3 w-96 h-64 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl"
+            initial={{ x: -400, rotate: -15, opacity: 0 }}
+            animate={{ x: 0, rotate: -15, opacity: 1 }}
+            transition={{ duration: 1.2, delay: 1.5 }}
+            whileHover={{
+              x: 30,
+              y: -10,
+              rotate: -10,
+              transition: { duration: 0.3 },
+            }}
           >
-            <div className="p-5 font-mono text-sm">
-              <div className="flex space-x-2 mb-3">
+            {/* ...existing code... */}
+            <div className="p-6 font-mono text-sm">
+              <div className="flex space-x-2 mb-4">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
               </div>
-              <div className="text-primary">function</div>
+              <div className="text-blue-600">function</div>
               <div className="pl-2">
-                <span className="text-primary">binarySearch</span>
-                <span>(arr, target) {`{`}</span>
+                <span className="text-purple-600">solveInterview</span>
+                <span>(candidate) {'{'}</span>
               </div>
-              <div className="pl-4">let left = 0;</div>
-              <div className="pl-4">let right = arr.length - 1;</div>
-              <div className="pl-4">while (left &lt;= right) {'{'}</div>
-              <div className="pl-6 text-muted-foreground">// Implementation</div>
-              <div className="pl-4">{`}`}</div>
-              <div className="pl-2">{`}`}</div>
+              <div className="pl-4 text-green-600">// AI-powered preparation</div>
+              <div className="pl-4">const success = ai.coach(candidate);</div>
+              <div className="pl-4">return success.probability;</div>
+              <div className="pl-2">{'}'}</div>
             </div>
           </motion.div>
 
-          <motion.div 
-            className="hidden lg:block absolute -right-20 top-2/3 w-80 h-48 bg-card/70 backdrop-blur-sm border border-border rounded-lg perspective-3d transform-3d shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:shadow-[0_8px_40px_rgb(59,130,246,0.2)] transition-all duration-500"
-            initial={{ x: 200, rotate: 12, opacity: 0 }}
-            animate={{ x: 0, rotate: 12, opacity: 1 }}
-            transition={{ duration: 1, delay: 1.3 }}
-            whileHover={{ x: -20, y: -5, transition: { duration: 0.3 } }}
-            style={{ boxShadow: "0 20px 40px -15px rgba(0,0,0,0.1), 0 5px 20px -5px rgba(0,0,0,0.05)" }}
+          <motion.div
+            className="hidden xl:block absolute -right-10 top-2/3 w-96 h-64 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-2xl"
+            initial={{ x: 400, rotate: 15, opacity: 0 }}
+            animate={{ x: 0, rotate: 15, opacity: 1 }}
+            transition={{ duration: 1.2, delay: 1.8 }}
+            whileHover={{
+              x: -30,
+              y: -10,
+              rotate: 10,
+              transition: { duration: 0.3 },
+            }}
           >
-            <div className="p-5 font-mono text-sm">
-              <div className="flex space-x-2 mb-3">
+            {/* ...existing code... */}
+            <div className="p-6 font-mono text-sm">
+              <div className="flex space-x-2 mb-4">
                 <div className="w-3 h-3 rounded-full bg-red-500"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500"></div>
               </div>
-              <div className="text-primary">class</div>
+              <div className="text-orange-600">class</div>
               <div className="pl-2">
-                <span className="text-primary">TreeNode</span>
-                <span> {`{`}</span>
+                <span className="text-blue-600">InterviewPrep</span>
+                <span> {'{'}</span>
               </div>
-              <div className="pl-4">constructor(val) {`{`}</div>
-              <div className="pl-6">this.val = val;</div>
-              <div className="pl-6">this.left = null;</div>
-              <div className="pl-6">this.right = null;</div>
-              <div className="pl-4">{`}`}</div>
-              <div className="pl-2">{`}`}</div>
+              <div className="pl-4">constructor() {'{'}</div>
+              <div className="pl-6">this.ai = new AICoach();</div>
+              <div className="pl-6">this.success_rate = 0.98;</div>
+              <div className="pl-4">{'}'}</div>
+              <div className="pl-2">{'}'}</div>
             </div>
           </motion.div>
         </section>
 
-        {/* Improved Features Showcase Section with dynamic cards */}
+        {/* Features Section */}
         <section className="py-20 relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/50 to-background -z-10"></div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 relative inline-block">
-              Key Features
-              <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent"></div>
+            <div className="inline-block bg-blue-500/10 text-blue-600 rounded-full px-4 py-2 text-sm font-medium mb-6">
+              <Rocket className="inline-block w-4 h-4 mr-2" />
+              Powerful Features
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">
+              Everything You Need to
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                {" "}
+                Succeed
+              </span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Everything you need to prepare for your next technical interview, all in one platform.
+              Comprehensive interview preparation tools powered by cutting-edge AI
+              technology
             </p>
           </motion.div>
 
-          {/* Highlighted feature with larger card */}
-          <div className="mb-16">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="max-w-5xl mx-auto"
-            >
-              <Card className="overflow-hidden border-primary/20 shadow-lg transform hover:scale-[1.02] transition-all duration-300">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="p-8 flex flex-col justify-center">
-                    <div className="bg-primary/10 w-14 h-14 flex items-center justify-center rounded-full mb-4">
-                      {React.createElement(features[activeFeatureIndex].icon, { className: "h-7 w-7 text-primary" })}
-                    </div>
-                    <h3 className="text-2xl font-bold mb-3">{features[activeFeatureIndex].title}</h3>
-                    <p className="text-muted-foreground mb-6">{features[activeFeatureIndex].description}</p>
-                    <Button asChild>
-                      <Link href={features[activeFeatureIndex].href} className="gap-2">
-                        Explore Feature <ChevronRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
+          {/* Featured card */}
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="max-w-6xl mx-auto mb-16"
+          >
+            <Card className="overflow-hidden border-blue-200/50 shadow-2xl bg-gradient-to-br from-white/50 to-blue-50/50 backdrop-blur-sm">
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="p-8 md:p-12 flex flex-col justify-center">
+                  <div className="inline-block bg-blue-500/10 text-blue-600 rounded-full px-3 py-1 text-sm font-medium mb-4">
+                    {features[activeFeatureIndex].badge}
                   </div>
-                  <div className={`bg-gradient-to-br ${features[activeFeatureIndex].color} p-8 text-white flex items-center justify-center`}>
-                    <div className="flex items-center justify-center w-full h-full backdrop-blur-sm bg-black/20 rounded-lg">
-                      {React.createElement(features[activeFeatureIndex].icon, { className: "h-24 w-24" })}
+                  <div className="bg-blue-500/10 w-16 h-16 flex items-center justify-center rounded-2xl mb-6">
+                    {React.createElement(
+                      features[activeFeatureIndex].icon,
+                      { className: "h-8 w-8 text-blue-600" }
+                    )}
+                  </div>
+                  <h3 className="text-3xl font-bold mb-4">
+                    {features[activeFeatureIndex].title}
+                  </h3>
+                  <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
+                    {features[activeFeatureIndex].description}
+                  </p>
+                  <Button size="lg" asChild className="w-fit">
+                    <Link
+                      href={features[activeFeatureIndex].href}
+                      className="gap-2"
+                    >
+                      Explore Feature{" "}
+                      <ChevronRight className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
+                <div
+                  className={`bg-gradient-to-br ${features[activeFeatureIndex].color} p-8 md:p-12 text-white flex items-center justify-center relative overflow-hidden`}
+                >
+                  <div className="absolute inset-0 bg-black/20"></div>
+                  <div className="relative z-10 text-center">
+                    {React.createElement(
+                      features[activeFeatureIndex].icon,
+                      { className: "h-32 w-32 mx-auto mb-4 opacity-90" }
+                    )}
+                    <div className="text-white/80 text-lg font-medium">
+                      {features[activeFeatureIndex].badge}
                     </div>
                   </div>
                 </div>
-              </Card>
-            </motion.div>
-          </div>
+              </div>
+            </Card>
+          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Features grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 + index * 0.1 }}
+                transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
               >
-                <Card 
-                  className="h-full border-border/40 hover:border-primary/30 transition-all duration-300 hover:shadow-lg overflow-hidden"
+                <Card
+                  className="h-full bg-white/50 backdrop-blur-sm border-white/20 hover:border-blue-300/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-2 overflow-hidden group cursor-pointer"
                   onMouseEnter={() => setActiveFeatureIndex(index)}
+                  onClick={() => (window.location.href = feature.href)}
                 >
                   <CardHeader className="pb-4">
-                    <div className={`bg-gradient-to-r ${feature.color} w-12 h-12 rounded-full flex items-center justify-center mb-3`}>
-                      <feature.icon className="h-6 w-6 text-white" />
+                    <div className="flex items-center justify-between mb-4">
+                      <div
+                        className={`bg-gradient-to-r ${feature.color} w-12 h-12 rounded-xl flex items-center justify-center shadow-lg`}
+                      >
+                        <feature.icon className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="bg-blue-500/10 text-blue-600 text-xs px-2 py-1 rounded-full font-medium">
+                        {feature.badge}
+                      </div>
                     </div>
-                    <CardTitle className="flex items-center">
+                    <CardTitle className="flex items-center text-xl">
                       {feature.title}
                       {index === activeFeatureIndex && (
-                        <motion.div 
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
                           className="ml-2"
                         >
-                          <Star className="h-4 w-4 text-amber-400 fill-amber-400" />
+                          <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
                         </motion.div>
                       )}
                     </CardTitle>
-                    <CardDescription className="text-sm h-20 overflow-hidden text-ellipsis">
-                      {feature.description.substring(0, 120)}...
+                    <CardDescription className="text-sm leading-relaxed">
+                      {feature.description}
                     </CardDescription>
                   </CardHeader>
                   <CardFooter>
-                    <Button variant="outline" asChild className="w-full group">
-                      <Link href={feature.href} className="flex items-center justify-between">
-                        <span>Explore</span>
+                    <Button
+                      variant="ghost"
+                      asChild
+                      className="w-full group-hover:bg-blue-50 transition-colors"
+                    >
+                      <Link
+                        href={feature.href}
+                        className="flex items-center justify-between"
+                      >
+                        <span>Learn More</span>
                         <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </Link>
                     </Button>
@@ -433,102 +592,130 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Enhanced CTA Section with testimonials */}
+        {/* Testimonials Section */}
         <section className="py-20 relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/5 -z-10 rounded-3xl"></div>
-          
-          {/* Flying particles in the background */}
-          {mounted && [...Array(15)].map((_, i) => (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center mb-16"
+          >
+            <div className="inline-block bg-green-500/10 text-green-600 rounded-full px-4 py-2 text-sm font-medium mb-6">
+              <Users className="inline-block w-4 h-4 mr-2" />
+              Success Stories
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold mb-6">
+              Loved by
+              <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                {" "}
+                Developers
+              </span>
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
+              >
+                <Card className="h-full bg-white/60 backdrop-blur-sm border-white/30 shadow-lg hover:shadow-xl transition-all">
+                  <CardHeader>
+                    <div className="flex items-center mb-4">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className="h-4 w-4 text-amber-400 fill-amber-400"
+                        />
+                      ))}
+                    </div>
+                    <CardDescription className="text-base italic leading-relaxed">
+                      "{testimonial.content}"
+                    </CardDescription>
+                  </CardHeader>
+                  <CardFooter>
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {testimonial.avatar}
+                      </div>
+                      <div>
+                        <div className="font-semibold">{testimonial.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {testimonial.role}
+                        </div>
+                      </div>
+                    </div>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className="py-20 relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-blue-500/5 rounded-3xl"></div>
+
+          <div className="max-w-6xl mx-auto px-4 relative z-10 text-center">
             <motion.div
-              key={i}
-              className="absolute rounded-full bg-primary/20"
-              initial={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * 500,
-                scale: Math.random() * 0.5 + 0.5,
-              }}
-              animate={{
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * 500,
-                scale: [Math.random() * 0.5 + 0.5, Math.random() * 1 + 0.8, Math.random() * 0.5 + 0.5],
-              }}
-              transition={{
-                duration: Math.random() * 20 + 10,
-                repeat: Infinity,
-                repeatType: "reverse",
-              }}
-              style={{
-                width: `${Math.random() * 10 + 5}px`,
-                height: `${Math.random() * 10 + 5}px`,
-                filter: "blur(1px)",
-              }}
-            />
-          ))}
-          
-          <div className="max-w-6xl mx-auto px-4 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-center mb-10"
             >
-              <div className="inline-block bg-primary/10 text-primary rounded-full px-4 py-1 text-sm font-medium mb-4">
-                <Zap className="inline-block w-4 h-4 mr-1" /> Get Started Today
+              <div className="inline-block bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full px-6 py-2 text-sm font-medium mb-6">
+                <Globe className="inline-block w-4 h-4 mr-2" />
+                Join 50,000+ Developers
               </div>
-              <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to Boost Your Interview Preparation?</h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-10">
-                Join thousands of students and professionals who have improved their technical interview skills with
-                InterviewBuddy AI. Our platform provides everything you need to succeed.
+              <h2 className="text-3xl md:text-5xl font-bold mb-6">
+                Ready to Ace Your Next Interview?
+              </h2>
+              <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+                Start your journey today with our AI-powered interview preparation
+                platform. Get personalized coaching, practice with real questions,
+                and land your dream job.
               </p>
-              
-              <div className="grid md:grid-cols-3 gap-6 mb-12 text-left">
-                <div className="bg-card/60 backdrop-blur-sm p-6 rounded-lg border border-border/50">
-                  <div className="flex items-center mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-amber-400 fill-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4">"InterviewBuddy AI helped me prepare for my Google interview. The DSA practice and mind maps were game changers!"</p>
-                  <div className="font-medium">Alex K.</div>
-                  <div className="text-sm text-muted-foreground">Software Engineer at Google</div>
-                </div>
-                <div className="bg-card/60 backdrop-blur-sm p-6 rounded-lg border border-border/50">
-                  <div className="flex items-center mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-amber-400 fill-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4">"The personalized study roadmap kept me on track, and the AI chat answered all my questions. Highly recommended!"</p>
-                  <div className="font-medium">Maya R.</div>
-                  <div className="text-sm text-muted-foreground">Frontend Developer at Microsoft</div>
-                </div>
-                <div className="bg-card/60 backdrop-blur-sm p-6 rounded-lg border border-border/50">
-                  <div className="flex items-center mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-amber-400 fill-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-muted-foreground mb-4">"I uploaded my study materials and the AI generated amazing flashcards and practice questions. Passed my interview with flying colors!"</p>
-                  <div className="font-medium">James T.</div>
-                  <div className="text-sm text-muted-foreground">Senior Developer at Amazon</div>
-                </div>
-              </div>
-              
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button 
-                  size="lg" 
-                  className="shadow-xl hover:shadow-2xl transition-all text-lg py-6 px-8 bg-gradient-to-r from-primary to-violet-600 hover:from-primary/95 hover:to-violet-700" 
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-12 py-6 text-lg font-semibold shadow-xl"
+                    asChild
+                  >
+                    <Link href="/login" className="flex items-center gap-2">
+                      <Rocket className="h-5 w-5" />
+                      Start Free Trial
+                      <ChevronRight className="h-5 w-5" />
+                    </Link>
+                  </Button>
+                </motion.div>
+
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="px-12 py-6 text-lg border-2 bg-white/50 backdrop-blur-sm"
                   asChild
                 >
-                  <Link href="/login" className="gap-2">
-                    Get Started Now
-                    <ChevronRight className="h-5 w-5" />
-                  </Link>
+                  <Link href="/login">View Pricing</Link>
                 </Button>
-              </motion.div>
+              </div>
+
+              <div className="flex items-center justify-center gap-8 text-sm text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  No credit card required
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  7-day free trial
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  Cancel anytime
+                </div>
+              </div>
             </motion.div>
           </div>
         </section>

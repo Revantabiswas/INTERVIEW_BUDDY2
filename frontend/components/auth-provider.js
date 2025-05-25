@@ -28,32 +28,37 @@ export function AuthProvider({ children }) {
     router.push('/login')
     router.refresh()
   }
-
   useEffect(() => {
-    // Fetch the current user when the component mounts
-    const fetchUser = async () => {
+    // Get initial session immediately for faster auth state detection
+    const getInitialSession = async () => {
       try {
-        const user = await getCurrentUser()
-        setUser(user)
+        const { data: { session } } = await supabase.auth.getSession()
+        if (session?.user) {
+          setUser(session.user)
+        }
+        setLoading(false)
       } catch (error) {
-        console.error('Error getting current user:', error)
-      } finally {
+        console.error('Error getting initial session:', error)
         setLoading(false)
       }
     }
 
-    fetchUser()
+    getInitialSession()
 
-    // Set up auth state change listener
+    // Set up auth state change listener for real-time updates
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
         if (session?.user) {
           setUser(session.user)
         } else {
           setUser(null)
         }
         setLoading(false)
-        router.refresh()
+        
+        // Only refresh on sign out to avoid unnecessary re-renders
+        if (event === 'SIGNED_OUT') {
+          router.refresh()
+        }
       }
     )
 
