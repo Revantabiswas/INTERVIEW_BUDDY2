@@ -837,6 +837,104 @@ const dsaApi = {
   },
 };
 
+// Exam Practice API
+const examPracticeApi = {
+  generateExam: async (examData) => {
+    try {
+      console.log('Generating exam with data:', examData);
+      const response = await api.post('/api/exam-practice/exams/generate', {
+        board: examData.board,
+        class_level: examData.class_level,
+        subject: examData.subject,
+        topic: examData.topic,
+        difficulty: examData.difficulty,
+        question_count: examData.question_count,
+        duration: examData.duration
+      });
+      console.log('Exam generation response:', response);
+      return response;
+    } catch (error) {
+      console.error('Error generating exam:', error);
+      throw new Error(error.response?.data?.detail || error.message || 'Failed to generate exam');
+    }
+  },
+
+  startExam: async (examId) => {
+    try {
+      console.log(`Starting exam ${examId}`);
+      const response = await api.post(`/api/exam-practice/exams/${examId}/start`);
+      console.log('Exam start response:', response);
+      return response;
+    } catch (error) {
+      console.error('Error starting exam:', error);
+      throw new Error(error.response?.data?.detail || error.message || 'Failed to start exam');
+    }
+  },
+
+  submitExamAttempt: async (attemptId, submissionData) => {
+    try {
+      console.log(`Submitting exam attempt ${attemptId}:`, submissionData);
+      const response = await api.post(`/api/exam-practice/exams/attempts/${attemptId}/submit`, {
+        answers: submissionData.answers,
+        time_spent: submissionData.time_spent,
+        completed_at: submissionData.completed_at,
+        skipped_questions: submissionData.skipped_questions || [],
+        bookmarked_questions: submissionData.bookmarked_questions || []
+      });
+      console.log('Exam submission response:', response);
+      return response;
+    } catch (error) {
+      console.error('Error submitting exam attempt:', error);
+      throw new Error(error.response?.data?.detail || error.message || 'Failed to submit exam attempt');
+    }
+  },
+
+  getAllExams: async () => {
+    try {
+      console.log('Fetching all exams');
+      const response = await api.get('/api/exam-practice/exams');
+      console.log('All exams response:', response);
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error('Error fetching exams:', error);
+      throw new Error(error.response?.data?.detail || error.message || 'Failed to fetch exams');
+    }
+  },
+
+  getExam: async (examId) => {
+    try {
+      console.log(`Fetching exam ${examId}`);
+      const response = await api.get(`/api/exam-practice/exams/${examId}`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching exam ${examId}:`, error);
+      throw new Error(error.response?.data?.detail || error.message || 'Failed to fetch exam');
+    }
+  },
+
+  getExamAttempts: async (examId) => {
+    try {
+      console.log(`Fetching attempts for exam ${examId}`);
+      const response = await api.get(`/api/exam-practice/exams/${examId}/attempts`);
+      return Array.isArray(response) ? response : [];
+    } catch (error) {
+      console.error(`Error fetching exam attempts for ${examId}:`, error);
+      throw new Error(error.response?.data?.detail || error.message || 'Failed to fetch exam attempts');
+    }
+  },
+
+  getAttemptResults: async (attemptId) => {
+    try {
+      console.log(`Fetching results for attempt ${attemptId}`);
+      const response = await api.get(`/api/exam-practice/exams/attempts/${attemptId}/results`);
+      return response;
+    } catch (error) {
+      console.error(`Error fetching attempt results for ${attemptId}:`, error);
+      throw new Error(error.response?.data?.detail || error.message || 'Failed to fetch attempt results');
+    }
+  }
+};
+
 // Progress Tracking API
 const progressApi = {
   getProgressData: async () => {
@@ -942,6 +1040,7 @@ export {
   dsaApi,
   progressApi,
   forumApi,
+  examPracticeApi,
 };
 
 export default {
@@ -955,4 +1054,5 @@ export default {
   dsa: dsaApi,
   progress: progressApi,
   forum: forumApi,
+  examPractice: examPracticeApi,
 };

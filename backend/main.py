@@ -34,6 +34,7 @@ from routers.roadmaps import router as roadmaps_router
 from routers.dsa import router as dsa_router
 from routers.progress import router as progress_router
 from routers.forum import router as forum_router  # Import forum router
+from routers.exam_practice import router as exam_practice_router  # Import exam practice router
 
 # Document processing
 import fitz  # PyMuPDF
@@ -70,9 +71,9 @@ from agents import (
     create_dsa_recommendation_agent,
     create_coding_pattern_agent,
     create_interview_strategy_agent,
-    create_company_specific_agent,
-    create_notes_generation_task,
+    create_company_specific_agent,    create_notes_generation_task,
     create_test_generation_task,
+    create_enhanced_test_generation_task,
     create_flashcard_generation_task,
     create_mind_map_task,
     create_progress_analysis_task,
@@ -204,6 +205,7 @@ app.include_router(roadmaps_router, prefix="/api/roadmaps", tags=["roadmaps"])
 app.include_router(dsa_router, prefix="/api/dsa", tags=["dsa"])
 app.include_router(progress_router, prefix="/api/progress", tags=["progress"])
 app.include_router(forum_router, prefix="/api/forum", tags=["forum"])  # Register forum router
+app.include_router(exam_practice_router, prefix="/api/exam-practice", tags=["exam-practice"])  # Register exam practice router
 
 # Error handling middleware
 @app.middleware("http")

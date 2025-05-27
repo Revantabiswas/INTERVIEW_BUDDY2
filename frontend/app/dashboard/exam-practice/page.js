@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { examPracticeApi } from "@/lib/api";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   FileText, 
   Download, 
@@ -27,16 +29,17 @@ import {
   Search,
   Settings,
   Zap,
-  Brain,  Award,
+  Brain,  
+  Award,
   CheckCircle,
   Users,
   TrendingUp,
   BarChart3,
   Eye,
   RefreshCw,
-  Bookmark
+  Bookmark,
+  Loader2
 } from "lucide-react";
-import { DownloadTestPDF, PrintTest } from "./components/DownloadPDF";
 
 export default function ExamPractice() {
   const [mounted, setMounted] = useState(false);
@@ -47,10 +50,123 @@ export default function ExamPractice() {
   const [testDuration, setTestDuration] = useState([60]);
   const [questionCount, setQuestionCount] = useState([20]);
   const [difficulty, setDifficulty] = useState("");
-
+  
+  // Loading and error states
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedTest, setGeneratedTest] = useState(null);
+  const [currentAttempt, setCurrentAttempt] = useState(null);
+  const [testResults, setTestResults] = useState(null);
+  const [error, setError] = useState("");
+  
+  // Test taking states
+  const [isTestMode, setIsTestMode] = useState(false);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [answers, setAnswers] = useState({});
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [testStartTime, setTestStartTime] = useState(null);
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Timer effect for test mode
+  useEffect(() => {
+    if (isTestMode && timeRemaining > 0) {
+      const timer = setInterval(() => {
+        setTimeRemaining(prev => {
+          if (prev <= 1) {
+            handleSubmitTest();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [isTestMode, timeRemaining]);  // API Functions
+  const generateTest = async () => {
+    if (!selectedSubject || !difficulty) {
+      setError("Please select subject and difficulty level");
+      return null;
+    }
+
+    setIsGenerating(true);
+    setError("");    try {
+      const test = await examPracticeApi.generateExam({
+        board: selectedBoard,
+        class_level: selectedClass,
+        subject: selectedSubject,
+        topic: selectedTopic,
+        difficulty: difficulty,
+        question_count: questionCount[0],
+        duration: testDuration[0]
+      });
+
+      setGeneratedTest(test);
+      setError("");
+      return test;
+    } catch (err) {
+      console.error('Generate test error:', err);
+      setError(err.message || 'Failed to generate test');
+      return null;
+    } finally {
+      setIsGenerating(false);
+    }
+  };  const startTest = async (testId) => {
+    try {
+      const attempt = await examPracticeApi.startExam(testId);
+      setCurrentAttempt(attempt);
+      setIsTestMode(true);
+      setCurrentQuestionIndex(0);
+      setAnswers({});
+      setTimeRemaining(testDuration[0] * 60); // Convert minutes to seconds
+      setTestStartTime(Date.now());
+    } catch (err) {
+      console.error('Start test error:', err);
+      setError(err.message || 'Failed to start test');
+    }
+  };
+
+  const handleAnswerChange = (questionId, answer) => {
+    setAnswers(prev => ({
+      ...prev,
+      [questionId]: answer
+    }));
+  };  const handleSubmitTest = async () => {
+    if (!currentAttempt) return;
+
+    try {
+      const timeSpent = {};
+      generatedTest.questions.forEach((q, index) => {
+        timeSpent[q.id] = Math.floor((Date.now() - testStartTime) / generatedTest.questions.length / 1000);
+      });      const results = await examPracticeApi.submitExamAttempt(currentAttempt.id, {
+        answers: answers,
+        time_spent: timeSpent,
+        completed_at: new Date().toISOString(),
+        skipped_questions: [],
+        bookmarked_questions: []
+      });
+
+      setTestResults(results);
+      setIsTestMode(false);
+      setCurrentAttempt(null);
+    } catch (err) {
+      console.error('Submit test error:', err);
+      setError(err.message || 'Failed to submit test');
+    }
+  };
+
+  const handleGenerateAndStart = async () => {
+    const test = await generateTest();
+    if (test && test.id) {
+      await startTest(test.id);
+    }
+  };
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   const boardOptions = [
     { value: "cbse", label: "CBSE" },
@@ -176,6 +292,292 @@ export default function ExamPractice() {
 
   if (!mounted) {
     return null;
+  }
+
+  // Test Mode UI
+  if (isTestMode && generatedTest && currentAttempt) {
+    const currentQuestion = generatedTest.questions[currentQuestionIndex];
+    const progress = ((currentQuestionIndex + 1) / generatedTest.questions.length) * 100;
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-6">
+        {/* Test Header */}
+        <div className="max-w-6xl mx-auto mb-6">
+          <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-white/20 dark:border-slate-700/50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-xl font-bold text-slate-800 dark:text-white">
+                    {generatedTest.title}
+                  </h1>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Question {currentQuestionIndex + 1} of {generatedTest.questions.length}
+                  </p>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-blue-500" />
+                    <span className={`text-lg font-mono font-bold ${
+                      timeRemaining < 300 ? 'text-red-500' : 'text-green-600'
+                    }`}>
+                      {formatTime(timeRemaining)}
+                    </span>
+                  </div>
+                  <Button variant="outline" onClick={handleSubmitTest} className="text-sm">
+                    Submit Test
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Progress Bar */}
+              <div className="mt-4">
+                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Question Panel */}
+          <div className="lg:col-span-3">
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-white/20 dark:border-slate-700/50">
+              <CardContent className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <Badge variant="outline" className="mb-2">
+                    {currentQuestion.difficulty} • {currentQuestion.marks} marks
+                  </Badge>
+                  {currentQuestion.expected_time && (
+                    <Badge variant="secondary">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {currentQuestion.expected_time} min
+                    </Badge>
+                  )}
+                </div>
+                
+                <div className="prose max-w-none dark:prose-invert mb-6">
+                  <h3 className="text-lg font-medium text-slate-800 dark:text-white mb-4">
+                    {currentQuestion.question}
+                  </h3>
+                </div>
+
+                {/* Multiple Choice Options */}
+                {currentQuestion.options && currentQuestion.options.length > 0 && (
+                  <div className="space-y-3">
+                    {currentQuestion.options.map((option, index) => {
+                      const optionLabel = String.fromCharCode(65 + index); // A, B, C, D
+                      const isSelected = answers[currentQuestion.id] === optionLabel;
+                      
+                      return (
+                        <div
+                          key={index}
+                          className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                            isSelected
+                              ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                              : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                          }`}
+                          onClick={() => handleAnswerChange(currentQuestion.id, optionLabel)}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-sm font-medium ${
+                              isSelected
+                                ? 'border-blue-500 bg-blue-500 text-white'
+                                : 'border-slate-300 dark:border-slate-600'
+                            }`}>
+                              {optionLabel}
+                            </div>
+                            <span className="text-slate-700 dark:text-slate-300">{option}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Text Answer Input */}
+                {(!currentQuestion.options || currentQuestion.options.length === 0) && (
+                  <div className="space-y-4">
+                    <Label htmlFor="answer">Your Answer</Label>
+                    <Textarea
+                      id="answer"
+                      placeholder="Enter your answer here..."
+                      value={answers[currentQuestion.id] || ''}
+                      onChange={(e) => handleAnswerChange(currentQuestion.id, e.target.value)}
+                      className="min-h-[120px]"
+                    />
+                  </div>
+                )}
+
+                {/* Navigation Buttons */}
+                <div className="flex justify-between mt-8">
+                  <Button
+                    variant="outline"
+                    onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
+                    disabled={currentQuestionIndex === 0}
+                  >
+                    Previous
+                  </Button>
+                  
+                  {currentQuestionIndex === generatedTest.questions.length - 1 ? (
+                    <Button onClick={handleSubmitTest} className="bg-green-600 hover:bg-green-700">
+                      Submit Test
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={() => setCurrentQuestionIndex(Math.min(generatedTest.questions.length - 1, currentQuestionIndex + 1))}
+                    >
+                      Next
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Question Navigation Panel */}
+          <div className="space-y-6">
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-white/20 dark:border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="text-sm">Question Navigator</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-5 gap-2">
+                  {generatedTest.questions.map((_, index) => {
+                    const isAnswered = answers[generatedTest.questions[index].id];
+                    const isCurrent = index === currentQuestionIndex;
+                    
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentQuestionIndex(index)}
+                        className={`w-8 h-8 rounded text-xs font-medium transition-all duration-200 ${
+                          isCurrent
+                            ? 'bg-blue-500 text-white'
+                            : isAnswered
+                            ? 'bg-green-500 text-white'
+                            : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-300 dark:hover:bg-slate-600'
+                        }`}
+                      >
+                        {index + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                {/* Legend */}
+                <div className="mt-4 space-y-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-green-500 rounded"></div>
+                    <span>Answered</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-blue-500 rounded"></div>
+                    <span>Current</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 bg-slate-300 dark:bg-slate-700 rounded"></div>
+                    <span>Not Visited</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-white/20 dark:border-slate-700/50">
+              <CardHeader>
+                <CardTitle className="text-sm">Test Stats</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm">
+                <div className="flex justify-between">
+                  <span>Answered:</span>
+                  <span className="font-medium">{Object.keys(answers).length}/{generatedTest.questions.length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Remaining:</span>
+                  <span className="font-medium">{generatedTest.questions.length - Object.keys(answers).length}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Total Marks:</span>
+                  <span className="font-medium">{generatedTest.total_marks}</span>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Results Display
+  if (testResults) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center mb-8"
+          >
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full mb-4">
+              <Trophy className="h-10 w-10 text-green-600" />
+            </div>
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">
+              Test Completed!
+            </h1>
+            <p className="text-slate-600 dark:text-slate-400">
+              Great job! Here are your results.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-white/20 dark:border-slate-700/50">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-blue-600 mb-2">
+                  {testResults.score}%
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Final Score</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-white/20 dark:border-slate-700/50">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-green-600 mb-2">
+                  {testResults.correct_answers}
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Correct Answers</p>
+              </CardContent>
+            </Card>
+            
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-lg border-white/20 dark:border-slate-700/50">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-purple-600 mb-2">
+                  {Math.floor(testResults.time_taken / 60)}m
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">Time Taken</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="flex justify-center gap-4">
+            <Button onClick={() => {
+              setTestResults(null);
+              setGeneratedTest(null);
+              setIsTestMode(false);
+              setCurrentAttempt(null);
+              setAnswers({});
+            }}>
+              Take Another Test
+            </Button>
+            <Button variant="outline">
+              Review Answers
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -367,15 +769,37 @@ export default function ExamPractice() {
                             </SelectContent>
                           </Select>
                         </div>
-                      </div>
+                      </div>                      {/* Error Display */}
+                      {error && (
+                        <Alert className="border-red-200 bg-red-50 text-red-800">
+                          <AlertDescription>{error}</AlertDescription>
+                        </Alert>
+                      )}
 
                       {/* Generate Buttons */}
-                      <div className="flex gap-4 pt-4">
-                        <Button className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
-                          <Play className="h-4 w-4 mr-2" />
-                          Generate & Start
+                      <div className="flex gap-4 pt-4">                        <Button 
+                          className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                          onClick={async () => {
+                            const test = await generateTest();
+                            if (test) {
+                              await startTest(test.id);
+                            }
+                          }}
+                          disabled={isGenerating || !selectedSubject || !difficulty}
+                        >
+                          {isGenerating ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Generating...
+                            </>
+                          ) : (
+                            <>
+                              <Play className="h-4 w-4 mr-2" />
+                              Generate & Start
+                            </>
+                          )}
                         </Button>
-                        <Button variant="outline" className="flex-1">
+                        <Button variant="outline" className="flex-1" disabled={!generatedTest}>
                           <Download className="h-4 w-4 mr-2" />
                           Generate & Download
                         </Button>

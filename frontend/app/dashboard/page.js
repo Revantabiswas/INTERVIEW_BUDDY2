@@ -38,7 +38,7 @@ import {
 } from "lucide-react";
 
 export default function Dashboard() {
-  const [mounted, setMounted] = useState(false);  const [userName] = useState("Alex");
+  const [mounted, setMounted] = useState(false);  const [userName] = useState("Revanta");
   const [currentStreak, setCurrentStreak] = useState(7);
   const [studyTime, setStudyTime] = useState(142);
   const [chaptersCompleted, setChaptersCompleted] = useState(42);

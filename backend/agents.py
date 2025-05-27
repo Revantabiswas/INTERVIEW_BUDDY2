@@ -319,6 +319,144 @@ def create_test_generation_task(agent, topic, difficulty, context):
         agent=agent
     )
 
+def create_enhanced_test_generation_task(agent, topic, difficulty, context, **kwargs):
+    """Create an enhanced test generation task with additional exam-specific parameters"""
+    question_count = kwargs.get("question_count", 20)
+    subject = kwargs.get("subject", "General")
+    board = kwargs.get("board", "")
+    class_level = kwargs.get("class_level", "")
+    with_difficulty_levels = kwargs.get("with_difficulty_levels", False)
+    with_topic_tags = kwargs.get("with_topic_tags", False)
+    with_time_estimates = kwargs.get("with_time_estimates", False)
+    time_limit = kwargs.get("time_limit", 60)
+    
+    # Build board and class context
+    board_context = ""
+    if board and class_level:
+        board_context = f"This test is for {board.upper()} Class {class_level} curriculum. "
+    elif board:
+        board_context = f"This test follows {board.upper()} curriculum standards. "
+    
+    # Build additional requirements
+    additional_requirements = []
+    if with_difficulty_levels:
+        additional_requirements.append("- Include difficulty level (Easy/Medium/Hard) for each question")
+    if with_topic_tags:
+        additional_requirements.append("- Add topic tags for each question")
+    if with_time_estimates:
+        additional_requirements.append("- Provide estimated time to solve each question")
+    
+    additional_req_text = "\n".join(additional_requirements) if additional_requirements else ""
+    
+    return Task(
+        description=f"""Create a comprehensive exam practice test with the following specifications:
+
+        Subject: {subject}
+        Topic: {topic}
+        Difficulty: {difficulty}
+        Number of Questions: {question_count}
+        Time Limit: {time_limit} minutes
+        {board_context}
+        
+        Context information:
+        {context}
+        
+        EXAM FORMAT REQUIREMENTS:
+        1. Create exactly {question_count} questions
+        2. Include a balanced mix of question types:
+           - Multiple Choice Questions (60%)
+           - Short Answer Questions (25%)
+           - Long Answer Questions (15%)
+        3. Ensure questions are appropriate for {difficulty} difficulty level
+        4. Questions should be relevant to the {subject} curriculum
+        5. Include clear instructions for each section
+        
+        QUESTION QUALITY STANDARDS:
+        - Each question should test specific learning objectives
+        - Questions should be clear, unambiguous, and grammatically correct
+        - Multiple choice options should be plausible and distinct
+        - Avoid trivial or overly complex questions
+        - Ensure questions cover different aspects of the topic
+        
+        OUTPUT FORMAT:
+        Structure your response as a JSON object with the following format:
+        {{
+            "exam_info": {{
+                "title": "Test title",
+                "subject": "{subject}",
+                "topic": "{topic}",
+                "difficulty": "{difficulty}",
+                "total_questions": {question_count},
+                "time_limit": {time_limit},
+                "instructions": "General test instructions"
+            }},
+            "sections": [
+                {{
+                    "section_name": "Multiple Choice Questions",
+                    "instructions": "Choose the best answer for each question",
+                    "questions": [
+                        {{
+                            "id": 1,
+                            "type": "mcq",
+                            "question": "Question text here",
+                            "options": ["A) Option 1", "B) Option 2", "C) Option 3", "D) Option 4"],
+                            "correct_answer": "A",
+                            "explanation": "Detailed explanation of the correct answer",
+                            "marks": 1,
+                            "topic_tag": "Specific topic",
+                            "difficulty_level": "Easy/Medium/Hard",
+                            "estimated_time": 2
+                        }}
+                    ]
+                }},
+                {{
+                    "section_name": "Short Answer Questions",
+                    "instructions": "Provide brief answers (2-3 sentences)",
+                    "questions": [
+                        {{
+                            "id": 13,
+                            "type": "short",
+                            "question": "Question text here",
+                            "sample_answer": "Expected answer",
+                            "marking_scheme": "Key points to award marks",
+                            "marks": 3,
+                            "topic_tag": "Specific topic",
+                            "difficulty_level": "Medium",
+                            "estimated_time": 5
+                        }}
+                    ]
+                }},
+                {{
+                    "section_name": "Long Answer Questions",
+                    "instructions": "Provide detailed answers with explanations",
+                    "questions": [
+                        {{
+                            "id": 18,
+                            "type": "long",
+                            "question": "Question text here",
+                            "sample_answer": "Comprehensive expected answer",
+                            "marking_scheme": "Detailed marking criteria",
+                            "marks": 5,
+                            "topic_tag": "Specific topic", 
+                            "difficulty_level": "Hard",
+                            "estimated_time": 10
+                        }}
+                    ]
+                }}
+            ],
+            "total_marks": 100,
+            "marking_scheme": "General marking guidelines"
+        }}
+        
+        ADDITIONAL REQUIREMENTS:
+        {additional_req_text}
+        
+        Ensure the test is comprehensive, well-structured, and appropriate for the specified academic level.
+        """,
+        expected_output="A comprehensive exam in JSON format with multiple sections, detailed questions, and complete marking scheme.",
+        agent=agent
+    )
+
 def create_flashcard_generation_task(agent, topic, context, num_cards=10):
     return Task(
         description=f"""Create a set of {num_cards} flashcards for the following topic.
