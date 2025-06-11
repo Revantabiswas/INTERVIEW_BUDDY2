@@ -17,3 +17,5 @@ PyPDF2
 langchain_groq
 crewai
 openai
+supabase
+python-decouple
